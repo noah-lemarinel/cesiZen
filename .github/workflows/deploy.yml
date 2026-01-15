@@ -1,0 +1,60 @@
+name: CI/CD
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    format:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Install dependencies
+                run: composer install
+
+            -   name: Run PHP CS Fixer
+                run: |
+                    php-cs-fixer fix --diff --dry-run .
+
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Run tests
+                run: php bin/phpunit
+
+#  deploy:
+#    needs: test
+#    if: needs.test.result == 'success' && github.ref == 'refs/heads/main'
+#    runs-on: ubuntu-latest
+#    env:
+#      DEPLOY_USER: deploy
+#      DEPLOY_HOST: example.com
+#      DEPLOY_PATH: /var/www/html
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Show deploy target
+#        run: echo "Deploying to ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}"
+#
+#      - name: Sync files to server
+#        run: |
+#          rsync -avz --delete \
+#            --exclude='.git' \
+#            --exclude='vendor' \
+#            --exclude='tests' \
+#            ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
+#
+#      - name: Remote post-deploy tasks
+#        run: |
+#          ssh ${DEPLOY_USER}@${DEPLOY_HOST} <<'EOSSH'
+#            set -e
+#            cd "${DEPLOY_PATH}"
+#            composer install --no-dev --optimize-autoloader --no-interaction || true
+#            if [ -f artisan ]; then
+#              php artisan migrate --force || true
+#            fi
+#          EOSSH

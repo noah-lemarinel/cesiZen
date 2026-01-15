@@ -1,0 +1,14 @@
+{# templates/emotion_tracker/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Emotion Tracker{% endblock %}
+
+{% block body %}
+    <h1>Emotion Tracker</h1>
+    <a href=\"{{ path('emotion_tracker_add') }}\">Add Emotion</a>
+    <ul>
+        {% for emotion in emotions %}
+            <li>{{ emotion.name }}: {{ emotion.description }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
