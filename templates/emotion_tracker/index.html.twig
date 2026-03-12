@@ -4,11 +4,63 @@
 {% block title %}Emotion Tracker{% endblock %}
 
 {% block body %}
-    <h1>Emotion Tracker</h1>
-    <a href=\"{{ path('emotion_tracker_add') }}\">Add Emotion</a>
-    <ul>
-        {% for emotion in emotions %}
-            <li>{{ emotion.name }}: {{ emotion.description }}</li>
-        {% endfor %}
-    </ul>
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-semibold">Emotion Tracker</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Visualisez vos émotions récentes et comment elles se mélangent.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ path('emotion_tracker_add') }}" class="bg-secondary text-white px-4 py-2 rounded shadow">Ajouter une émotion</a>
+            </div>
+        </div>
+
+        {# Color palette assignment for emotions (cycle if more emotions than colors) #}
+        {% set palette = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#9B59B6', '#FF9F1C', '#2EC4B6'] %}
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <aside class="md:col-span-1 bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h2 class="text-lg font-medium mb-3">Palette d'émotions</h2>
+                <ul class="space-y-2">
+                    {% for emotion in emotions %}
+                        {% set color = palette[loop.index0 % palette|length] %}
+                        <li class="flex items-center gap-3">
+                            <span class="w-4 h-4 rounded-full" style="background: {{ color }}"></span>
+                            <div>
+                                <div class="font-medium">{{ emotion.name }}</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-400">{{ emotion.description }}</div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="text-sm text-gray-500">Aucune émotion trouvée. Ajoutez-en une !</li>
+                    {% endfor %}
+                </ul>
+            </aside>
+
+            <div class="md:col-span-3">
+                <div class="bg-white/60 dark:bg-gray-800 rounded p-4 shadow mb-4">
+                    <h2 class="text-lg font-medium mb-2">Jours précédents</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Cliquez sur une carte pour voir en détail le mélange d'émotions du jour.</p>
+                    <div id="days-visuals" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+                <div class="text-xs text-gray-500">Les couleurs sont associées aux émotions et sont mélangées à l'aide d'un rendu graphique pour montrer les humeurs combinées.</div>
+            </div>
+        </div>
+
+        {# Export emotion data to JS for the visualization script #}
+        <script>
+            window.EMOTIONS = [
+                {% for emotion in emotions %}
+                    {
+                        name: "{{ emotion.name|e('js') }}",
+                        description: "{{ (emotion.description ?? '')|e('js') }}",
+                        color: "{{ palette[loop.index0 % palette|length] }}"
+                    }{{ loop.last ? '' : ',' }}
+                {% endfor %}
+            ];
+        </script>
+
+        {# Load visualization script (deferred) #}
+        <script defer src="{{ asset('js/emotion-bubbles.js') }}"></script>
+    </div>
 {% endblock %}

@@ -57,6 +57,7 @@ class MainController extends AbstractController
             // Create user
             $user = new User();
             $user->setEmail($email);
+            $user->setName($name ?: null);
             // Hash the password using Symfony's hasher
             $hashed = $passwordHasher->hashPassword($user, $password);
             $user->setPassword($hashed);
