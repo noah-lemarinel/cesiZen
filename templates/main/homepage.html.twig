@@ -1,139 +1,107 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CesiZen - Accueil</title>
-    <style>
-        /* Color Palette from the Cahier des Charges */
-        :root {
-            --primary-color: #7FD8BE; /* Vert */
-            --secondary-color: #0C7489; /* Bleu */
-            --dark-color: #0D1321; /* Bleu foncé */
-            --light-color: #F5F5F5; /* Gris clair */
-            --alert-color: #D32F2F; /* Rouge d'alerte */
-        }
+{% extends 'base.html.twig' %}
+{% block title %}CesiZen - Accueil{% endblock %}
 
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-color);
-            color: var(--dark-color);
-        }
+{% block body %}
+    <main class="container mx-auto px-6 py-12">
+        <!-- Hero -->
+        <section
+            class="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-8 transform transition-all duration-300 hover:shadow-2xl dark:bg-gray-900">
+            <div class="md:flex md:items-center md:justify-between gap-8">
+                <div class="md:w-2/3">
+                    <h2 class="text-3xl md:text-4xl font-bold text-darkblue mb-4 dark:text-white">Mieux comprendre et
+                        gérer
+                        votre stress</h2>
+                    <p class="text-gray-700 mb-6 dark:text-gray-300">CesiZen vous propose des outils simples et éprouvés
+                        pour suivre vos émotions, pratiquer la respiration et accéder à des ressources pédagogiques.</p>
+                    <div class="flex gap-3">
+                        <a href="/register"
+                           class="inline-block bg-secondary text-white px-5 py-3 rounded-lg font-semibold shadow hover:bg-darkblue transition-colors duration-200 transform hover:-translate-y-0.5">Créer
+                            un Compte</a>
+                        <a href="#"
+                           class="inline-block bg-white border border-gray-200 text-darkblue px-5 py-3 rounded-lg font-semibold hover:shadow-md transition-all duration-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white">Découvrir</a>
+                    </div>
+                </div>
+                <div class="md:w-1/3 mt-6 md:mt-0">
+                    <!-- illustrative card -->
+                    <div
+                        class="bg-gradient-to-br from-primary to-white rounded-xl p-6 shadow-md transition-transform duration-300 hover:scale-105 dark:from-secondary dark:to-gray-800">
+                        <h3 class="text-lg font-semibold text-darkblue mb-2 dark:text-white">Tracker d'Émotions</h3>
+                        <p class="text-sm text-darkblue/80 mb-4 dark:text-gray-300">Notez vos émotions quotidiennement
+                            et
+                            visualisez vos tendances au fil du temps.</p>
+                        <a href="#"
+                           class="inline-block bg-darkblue text-white px-4 py-2 rounded-md font-medium transition-colors duration-200">Accéder
+                            au tracker</a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem;
-            text-align: center;
-        }
+        <!-- Features -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <article
+                class="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 dark:bg-gray-800">
+                <h4 class="font-semibold text-lg mb-2 dark:text-white">Tracker d'Émotions</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Suivez vos humeurs et identifiez les déclencheurs
+                    grâce
+                    à un journal simple et rapide.</p>
+            </article>
 
-        nav {
-            background-color: var(--dark-color);
-            color: white;
-            padding: 0.5rem;
-            text-align: center;
-        }
+            <article
+                class="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 dark:bg-gray-800">
+                <h4 class="font-semibold text-lg mb-2 dark:text-white">Exercices de Respiration</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Exercices guidés basés sur la cohérence cardiaque
+                    pour
+                    réduire le stress en quelques minutes.</p>
+            </article>
 
-        nav a {
-            color: white;
-            margin: 0 1rem;
-            text-decoration: none;
-        }
+            <article
+                class="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 dark:bg-gray-800">
+                <h4 class="font-semibold text-lg mb-2 dark:text-white">Ressources Pédagogiques</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Articles, guides et astuces pour mieux comprendre la
+                    santé mentale et les bonnes pratiques.</p>
+            </article>
+        </section>
 
-        main {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        <!-- Callout / CTA -->
+        <section
+            class="bg-secondary text-white rounded-xl p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 dark:bg-primary">
+            <div>
+                <h3 class="text-xl font-bold">Commencez dès maintenant</h3>
+                <p class="text-sm opacity-90">Créez un compte gratuit et commencez à suivre votre bien-être
+                    aujourd'hui.</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="/register"
+                   class="bg-white text-secondary px-4 py-2 rounded-md font-semibold shadow hover:scale-105 transform transition duration-200 dark:bg-gray-800 dark:text-white">Créer
+                    un Compte</a>
+                <a href="/login"
+                   class="bg-white/20 border border-white/30 text-white px-4 py-2 rounded-md font-semibold hover:bg-white/30 transition-colors duration-200">Se
+                    Connecter</a>
+            </div>
+        </section>
 
-        section {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+        <!-- Additional info / report sample -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl p-6 shadow-md dark:bg-gray-800">
+                <h4 class="font-semibold text-lg mb-3 dark:text-white">Rapports & Tendances</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Visualisez vos progrès au fil du temps avec des
+                    graphiques clairs et des résumés intelligents.</p>
+                <a href="#"
+                   class="mt-4 inline-block text-secondary font-medium hover:underline transition dark:text-primary">Voir
+                    un
+                    exemple de rapport</a>
+            </div>
 
-        h1, h2 {
-            color: var(--dark-color);
-        }
-
-        .btn {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn:hover {
-            background-color: var(--dark-color);
-        }
-
-        footer {
-            background-color: var(--dark-color);
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            margin-top: 2rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            main {
-                padding: 1rem;
-            }
-        }
-    </style>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-<header>
-    <h1>Bienvenue sur CesiZen</h1>
-    <p>Votre compagnon pour une meilleure santé mentale</p>
-</header>
-
-<nav>
-    <a href="#">Accueil</a>
-    <a href="#">Tracker d'Émotions</a>
-    <a href="#">Exercices de Respiration</a>
-    <a href="#">Ressources</a>
-    <a href="#">Contact</a>
-</nav>
-
-<main>
-    <section>
-        <h2>À propos de CesiZen</h2>
-        <p>
-            CesiZen est une application conçue pour vous aider à mieux comprendre et gérer votre stress.
-            Nous proposons des outils pratiques et des ressources pour préserver votre santé mentale au quotidien.
-        </p>
-    </section>
-
-    <section>
-        <h2>Nos Fonctionnalités</h2>
-        <ul>
-            <li>Tracker d'Émotions: Suivez vos émotions et identifiez vos tendances.</li>
-            <li>Exercices de Respiration: Des exercices basés sur la cohérence cardiaque pour réduire le stress.</li>
-            <li>Ressources Pédagogiques: Des articles et guides pour mieux comprendre la santé mentale.</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>Commencez dès maintenant</h2>
-        <a href="#" class="btn">Créer un Compte</a>
-        <a href="#" class="btn">Se Connecter</a>
-    </section>
-</main>
-
-<footer>
-    <p>&copy; 2026 CesiZen. Tous droits réservés.</p>
-</footer>
-</body>
-</html>
+            <div class="bg-white rounded-xl p-6 shadow-md dark:bg-gray-800">
+                <h4 class="font-semibold text-lg mb-3 dark:text-white">Support & Confidentialité</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Vos données sont privées et stockées en toute
+                    sécurité.
+                    Accédez au support à tout moment.</p>
+                <a href="#"
+                   class="mt-4 inline-block text-secondary font-medium hover:underline transition dark:text-primary">En
+                    savoir plus</a>
+            </div>
+        </section>
+    </main>
+{% endblock %}

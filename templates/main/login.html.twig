@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - CesiZen{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-lightgray dark:bg-darkblue">
+  <div class="bg-white rounded-xl shadow-md p-8 w-full max-w-md dark:bg-gray-800">
+    <h2 class="text-2xl font-bold mb-4 dark:text-white">Se connecter</h2>
+
+    {% for type, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="mb-4 p-3 rounded text-sm {% if type == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">{{ message }}</div>
+      {% endfor %}
+    {% endfor %}
+
+    {% if error %}
+      <div class="mb-4 p-3 rounded text-sm bg-red-100 text-red-800">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    <form id="login-form" method="post" action="{{ path('app_login') }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+      <div class="mb-4">
+        <label for="email" class="block text-sm font-medium mb-1 dark:text-white">Email</label>
+        <input id="email" name="email" type="email" value="{{ last_email|default('') }}" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" required autofocus>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium mb-1 dark:text-white">Mot de passe</label>
+        <input id="password" name="password" type="password" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <button type="submit" class="bg-secondary text-white px-4 py-2 rounded-md font-semibold">Se connecter</button>
+        <a href="{{ path('app_register') }}" class="text-sm text-gray-600 hover:underline dark:text-gray-300">Pas encore de compte ? S'inscrire</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
