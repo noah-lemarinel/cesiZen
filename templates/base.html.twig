@@ -64,25 +64,9 @@
                class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Tracker
                 d'Émotions</a>
             <a href="{{ path('exercises_index') }}" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Exercices</a>
-            <a href="#" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Ressources</a>
+            <a href="{{ path('resources_index') }}" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Ressources</a>
             <a href="#"
                class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Contact</a>
-            {% if app.user and app.user.isAdmin() %}
-                <div class="relative group">
-                    <button class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-                            <path fill="currentColor" d="M15 2H5L4 8h12zM0 10s2 1 10 1s10-1 10-1l-4-2H4zm8 4h4v1H8z"/>
-                            <circle cx="6" cy="15" r="3" fill="currentColor"/>
-                            <circle cx="14" cy="15" r="3" fill="currentColor"/>
-                        </svg>
-                        <span class="text-sm">Admin</span>
-                    </button>
-                    <div class="absolute left-0 hidden group-hover:block bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded shadow-lg z-50 min-w-max">
-                        <a href="{{ path('admin_emotion_index') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">Émotions</a>
-                        <a href="{{ path('admin_exercise_index') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">Exercices</a>
-                    </div>
-                </div>
-            {% endif %}
         </nav>
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-4">

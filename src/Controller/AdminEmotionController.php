@@ -9,11 +9,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 
+// Admin routes disabled - use EmotionTrackerController instead
 class AdminEmotionController extends AbstractController
 {
-    #[Route('/admin/emotions', name: 'admin_emotion_index')]
     public function index(EmotionRepository $emotionRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -25,7 +24,6 @@ class AdminEmotionController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/emotions/new', name: 'admin_emotion_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');

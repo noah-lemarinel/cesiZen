@@ -1,0 +1,50 @@
+{# templates/resources/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouvel article - Blog{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-3xl mx-auto">
+            <a href="{{ path('resources_index') }}" class="text-secondary hover:underline mb-6 inline-block">
+                ← Retour aux ressources
+            </a>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <h1 class="text-3xl font-semibold mb-6">Créer un nouvel article</h1>
+
+                {{ form_start(form) }}
+                <div class="space-y-6">
+                    <div>
+                        {{ form_label(form.title) }}
+                        {{ form_widget(form.title, { attr: { class: 'mt-2 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white' } }) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.content) }}
+                        {{ form_widget(form.content, { attr: { class: 'mt-2 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white' } }) }}
+                        {{ form_errors(form.content) }}
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        {{ form_widget(form.isPublished) }}
+                        {{ form_label(form.isPublished) }}
+                        {{ form_errors(form.isPublished) }}
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="submit" class="bg-secondary text-white px-6 py-2 rounded shadow hover:opacity-90">
+                            Créer l'article
+                        </button>
+                        <a href="{{ path('resources_index') }}" class="bg-gray-500 text-white px-6 py-2 rounded shadow hover:opacity-90">
+                            Annuler
+                        </a>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

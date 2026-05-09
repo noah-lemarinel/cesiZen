@@ -1,0 +1,50 @@
+{# templates/resources/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ post.title }} - Blog{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-3xl mx-auto">
+            <a href="{{ path('resources_index') }}" class="text-secondary hover:underline mb-6 inline-block">
+                ← Retour aux ressources
+            </a>
+
+            <article class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <h1 class="text-4xl font-semibold mb-4">{{ post.title }}</h1>
+
+                <div class="flex items-center justify-between mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <strong>Par {{ post.author.name ?? post.author.email }}</strong>
+                        <br>
+                        Publié le {{ post.createdAt|format_datetime(locale='fr') }}
+                        {% if post.updatedAt %}
+                            <br>
+                            Modifié le {{ post.updatedAt|format_datetime(locale='fr') }}
+                        {% endif %}
+                    </div>
+
+                    {% if app.user and app.user.isAdmin %}
+                        <div class="flex gap-2">
+                            <a href="{{ path('blog_post_edit', { id: post.id }) }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Éditer
+                            </a>
+                            <form method="POST" action="{{ path('blog_post_delete', { id: post.id }) }}" style="display:inline;"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="prose prose-invert max-w-none dark:prose-invert text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {{ post.content|nl2br }}
+                </div>
+            </article>
+        </div>
+    </div>
+{% endblock %}
+

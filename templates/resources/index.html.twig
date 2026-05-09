@@ -1,0 +1,68 @@
+{# templates/resources/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Ressources - Blog{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-semibold">Ressources</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Découvrez nos articles et ressources utiles.</p>
+            </div>
+            {% if app.user and app.user.isAdmin %}
+                <div class="flex items-center gap-3">
+                    <a href="{{ path('blog_post_new') }}" class="bg-secondary text-white px-4 py-2 rounded shadow hover:opacity-90">
+                        Créer un article
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if posts|length > 0 %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for post in posts %}
+                    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                        <div class="p-6">
+                            <h2 class="text-xl font-semibold mb-2">
+                                <a href="{{ path('blog_post_show', { id: post.id }) }}" class="text-secondary hover:underline">
+                                    {{ post.title }}
+                                </a>
+                            </h2>
+                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                Par <strong>{{ post.author.name ?? post.author.email }}</strong>
+                                <br>
+                                {{ post.createdAt|format_datetime(locale='fr') }}
+                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
+                                {{ post.content[:200] }}...
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <a href="{{ path('blog_post_show', { id: post.id }) }}" class="text-secondary hover:underline">
+                                    Lire la suite →
+                                </a>
+                                {% if app.user and app.user.isAdmin %}
+                                    <div class="flex gap-2">
+                                        <a href="{{ path('blog_post_edit', { id: post.id }) }}" class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                                            Éditer
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Aucun article disponible pour le moment.</p>
+                {% if app.user and app.user.isAdmin %}
+                    <a href="{{ path('blog_post_new') }}" class="bg-secondary text-white px-4 py-2 rounded shadow hover:opacity-90">
+                        Créer le premier article
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+

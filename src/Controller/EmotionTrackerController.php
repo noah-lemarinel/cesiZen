@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Emotion;
 use App\Form\EmotionEntryType;
+use App\Form\EmotionType;
 use App\Repository\EmotionEntryRepository;
 use App\Entity\EmotionEntry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,12 +16,27 @@ use Symfony\Component\Routing\Attribute\Route;
 class EmotionTrackerController extends AbstractController
 {
     #[Route('/emotion/tracker', name: 'emotion_tracker_index')]
-    public function index(EmotionEntryRepository $emotionEntryRepository): Response
+    public function index(EmotionEntryRepository $emotionEntryRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $emotions = $emotionEntryRepository->findAll();
 
+        // Create emotion form
+        $emotionForm = $this->createForm(EmotionType::class);
+        $emotionForm->handleRequest($request);
+
+        if ($emotionForm->isSubmitted() && $emotionForm->isValid()) {
+            $emotion = $emotionForm->getData();
+            $entityManager->persist($emotion);
+            $entityManager->flush();
+
+            $this->addFlash('success', sprintf('Émotion "%s" créée.', $emotion->getName()));
+
+            return $this->redirectToRoute('emotion_tracker_index');
+        }
+
         return $this->render('emotion_tracker/index.html.twig', [
             'emotions' => $emotions,
+            'emotionForm' => $emotionForm->createView(),
         ]);
     }
 

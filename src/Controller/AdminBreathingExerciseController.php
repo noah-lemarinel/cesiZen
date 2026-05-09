@@ -9,11 +9,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 
+// Admin routes disabled
 class AdminBreathingExerciseController extends AbstractController
 {
-    #[Route('/admin/exercises', name: 'admin_exercise_index')]
     public function index(BreathingExerciseRepository $exerciseRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -25,7 +24,6 @@ class AdminBreathingExerciseController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/exercises/new', name: 'admin_exercise_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -48,7 +46,6 @@ class AdminBreathingExerciseController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/exercises/{id}/edit', name: 'admin_exercise_edit')]
     public function edit(Request $request, BreathingExercise $exercise, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -70,7 +67,6 @@ class AdminBreathingExerciseController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/exercises/{id}/delete', name: 'admin_exercise_delete', methods: ['POST'])]
     public function delete(Request $request, BreathingExercise $exercise, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
