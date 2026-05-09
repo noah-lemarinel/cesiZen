@@ -4,7 +4,9 @@ namespace App\Form;
 
 use App\Entity\Emotion;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmotionType extends AbstractType
@@ -13,7 +15,9 @@ class EmotionType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('description');
+            ->add('color', ColorType::class, [
+                'required' => true,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

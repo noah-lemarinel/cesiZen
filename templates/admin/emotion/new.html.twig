@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Créer une émotion{% endblock %}
+
+{# Add Pickr CSS to the head while keeping parent styles #}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-xl mx-auto bg-white/60 dark:bg-gray-800 rounded p-6 shadow">
+            <h1 class="text-2xl font-semibold mb-4">Créer une émotion</h1>
+
+            {{ form_start(form) }}
+            <div class="space-y-4">
+                {# Name field - styled #}
+                <div>
+                    {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                    {{ form_widget(form.name, {
+                        'attr': {
+                            'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700',
+                            'placeholder': 'Ex: Joie'
+                        }
+                    }) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                {# Color field - hidden Symfony input + Pickr UI #}
+                <div>
+                    {{ form_label(form.color, 'Couleur', {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                    {# render the actual form field as a hidden input so the value is submitted #}
+                    {{ form_widget(form.color, {'attr': {'class': 'hidden', 'id': 'emotion_color_input'}}) }}
+
+                    <div class="flex items-center gap-4">
+                        <div id="color-swatch" class="w-12 h-12 rounded-full border cursor-pointer"
+                             title="Choisir une couleur"></div>
+                        <div id="pickr-container" class="hidden"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Cliquez sur le cercle pour ouvrir le
+                            sélecteur
+                        </div>
+                    </div>
+
+                    {{ form_errors(form.color) }}
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button type="submit" class="bg-secondary text-white px-4 py-2 rounded">Créer</button>
+                    <a href="{{ path('admin_emotion_index') }}" class="text-sm text-gray-600">Annuler</a>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{# include Pickr and init script, keep parent's javascripts #}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Grab the hidden input and current value (if any)
+            const input = document.getElementById('emotion_color_input');
+            // Fallback color
+            const initial = (input && input.value) ? input.value : '#7FD8BE';
+
+            // Create a small button that Pickr will attach to
+            const pickrRoot = document.getElementById('pickr-container');
+            // create an element for pickr to attach so the small swatch remains separate
+            const el = document.createElement('button');
+            el.type = 'button';
+            el.id = 'pickr-button';
+            el.className = 'w-8 h-8 rounded-full border';
+            el.style.padding = '0';
+            if (pickrRoot) pickrRoot.appendChild(el);
+
+            // Keep a visible swatch in sync
+            const swatch = document.getElementById('color-swatch');
+            if (swatch) swatch.style.background = initial;
+
+            const pickr = Pickr.create({
+                el: '#pickr-button',
+                theme: 'classic', // or 'monolith', or 'nano'
+                default: initial,
+                components: {
+                    // Main components
+                    preview: true,
+                    opacity: false,
+                    hue: true,
+
+                    // Input / output Options
+                    interaction: {
+                        hex: true,
+                        rgba: false,
+                        input: true,
+                        clear: false,
+                        save: true
+                    }
+                }
+            });
+
+            pickr.on('change', (color) => {
+                const hex = color.toHEXA().toString();
+                if (swatch) swatch.style.background = hex;
+                if (input) input.value = hex;
+            });
+
+            // When user clicks save in pickr, also update and close
+            pickr.on('save', (color) => {
+                const hex = color ? color.toHEXA().toString() : '';
+                if (swatch) swatch.style.background = hex;
+                if (input) input.value = hex;
+                pickr.hide();
+            });
+
+            // Clicking on the big swatch should open the pickr
+            if (swatch) {
+                swatch.addEventListener('click', function () {
+                    pickr.show();
+                });
+            }
+        });
+    </script>
+{% endblock %}
+

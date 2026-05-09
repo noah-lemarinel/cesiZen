@@ -40,77 +40,92 @@
     {% endblock %}
 </head>
 <body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-<header class="bg-primary text-white p-4 dark:bg-gray-800">
-    <header class="bg-primary text-white dark:bg-secondary">
-        <div class="container mx-auto px-6 py-6 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="rounded-full bg-white/20 p-2 flex-shrink-0">
-                    <!-- simple logo mark -->
-                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                         aria-hidden="true">
-                        <circle cx="12" cy="12" r="9" fill="white" fill-opacity="0.15"></circle>
-                        <path d="M8 13c1.2 1 2.8 1 4 0 1.2-1 2-3 2-3s-1.6-1-3-1c-1.4 0-3 1-3 1s-.2 2 .0 3z" fill="white"
-                              fill-opacity="0.9"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-semibold">CesiZen</h1>
-                    <p class="text-sm opacity-90">Votre compagnon pour une meilleure santé mentale</p>
-                </div>
+<header class="bg-primary text-white p-4 dark:bg-secondary shadow-md">
+    <div class="container mx-auto px-6 py-6 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="rounded-full bg-white/20 p-2 flex-shrink-0">
+                <!-- simple logo mark -->
+                <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                     aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" fill="white" fill-opacity="0.15"></circle>
+                    <path d="M8 13c1.2 1 2.8 1 4 0 1.2-1 2-3 2-3s-1.6-1-3-1c-1.4 0-3 1-3 1s-.2 2 .0 3z" fill="white"
+                          fill-opacity="0.9"></path>
+                </svg>
             </div>
-            <nav class="hidden md:flex items-center gap-4">
-                <a href="#"
-                   class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Accueil</a>
-                <a href="#" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Tracker
-                    d'Émotions</a>
-                <a href="#" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Exercices</a>
-                <a href="#" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Ressources</a>
-                <a href="#"
-                   class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Contact</a>
-            </nav>
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-4">
-                    {% if app.user %}
-                        <span
-                            class="text-sm">Connecté en tant que {{ app.user.name ?? app.user.userIdentifier }}</span>
-                        <a href="{{ path('app_logout') }}" class="bg-white text-secondary px-3 py-1 rounded">Se
-                            déconnecter</a>
-                    {% else %}
-                        <a href="{{ path('app_login') }}" class="text-sm">Se connecter</a>
-                        <a href="{{ path('app_register') }}" class="text-sm">S'inscrire</a>
-                    {% endif %}
-                </div>
-                <!-- Theme toggle -->
-                <button id="theme-toggle"
-                        class="p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
-                        aria-label="Basculer le thème" aria-pressed="false">
-                    <!-- Moon (light mode) -->
-                    <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-                    </svg>
-                    <!-- Sun (dark mode) -->
-                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M7.05 7.05L5.63 5.63m12.02 0l-1.42 1.42M7.05 16.95l-1.42 1.42M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                    </svg>
-                </button>
-
-                <button class="md:hidden p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
-                        aria-label="Menu">
-                    <!-- hamburger -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
+            <div>
+                <h1 class="text-2xl font-semibold">CesiZen</h1>
+                <p class="text-sm opacity-90">Votre compagnon pour une meilleure santé mentale</p>
             </div>
         </div>
-    </header>
+        <nav class="hidden md:flex items-center gap-4">
+            <a href="/"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Accueil</a>
+            <a href="/emotion/tracker"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Tracker
+                d'Émotions</a>
+            <a href="{{ path('exercises_index') }}" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Exercices</a>
+            <a href="#" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Ressources</a>
+            <a href="#"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Contact</a>
+            {% if app.user and app.user.isAdmin() %}
+                <div class="relative group">
+                    <button class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+                            <path fill="currentColor" d="M15 2H5L4 8h12zM0 10s2 1 10 1s10-1 10-1l-4-2H4zm8 4h4v1H8z"/>
+                            <circle cx="6" cy="15" r="3" fill="currentColor"/>
+                            <circle cx="14" cy="15" r="3" fill="currentColor"/>
+                        </svg>
+                        <span class="text-sm">Admin</span>
+                    </button>
+                    <div class="absolute left-0 hidden group-hover:block bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded shadow-lg z-50 min-w-max">
+                        <a href="{{ path('admin_emotion_index') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">Émotions</a>
+                        <a href="{{ path('admin_exercise_index') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">Exercices</a>
+                    </div>
+                </div>
+            {% endif %}
+        </nav>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
+                {% if app.user %}
+                    <span
+                        class="text-sm">Connecté en tant que {{ app.user.name ?? app.user.userIdentifier }}</span>
+                    <a href="{{ path('app_logout') }}" class="bg-white text-secondary px-3 py-1 rounded">Se
+                        déconnecter</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="text-sm">Se connecter</a>
+                    <a href="{{ path('app_register') }}" class="text-sm">S'inscrire</a>
+                {% endif %}
+            </div>
+            <!-- Theme toggle -->
+            <button id="theme-toggle"
+                    class="p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
+                    aria-label="Basculer le thème" aria-pressed="false">
+                <!-- Moon (light mode) -->
+                <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                </svg>
+                <!-- Sun (dark mode) -->
+                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M7.05 7.05L5.63 5.63m12.02 0l-1.42 1.42M7.05 16.95l-1.42 1.42M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+
+            <button class="md:hidden p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
+                    aria-label="Menu">
+                <!-- hamburger -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
 </header>
 
 {% block body %}{% endblock %}

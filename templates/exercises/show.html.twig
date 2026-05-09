@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ exercise.name }}{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-2xl mx-auto">
+            <a href="{{ path('exercises_index') }}" class="text-secondary hover:underline text-sm mb-4 inline-block">← Retour aux exercices</a>
+
+            <div class="bg-white/60 dark:bg-gray-800 rounded-lg shadow-md p-8">
+                <h1 class="text-3xl font-semibold mb-4">{{ exercise.name }}</h1>
+
+                {% if exercise.description %}
+                    <p class="text-gray-600 dark:text-gray-400 mb-8">{{ exercise.description }}</p>
+                {% endif %}
+
+                {# Exercise details #}
+                <div class="grid grid-cols-3 gap-4 mb-8 p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="text-center">
+                        <div class="text-2xl font-semibold text-secondary">{{ exercise.inhaleSeconds }}s</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Inspiration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-semibold text-secondary">{{ exercise.holdSeconds }}s</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Retenue</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-semibold text-secondary">{{ exercise.exhaleSeconds }}s</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Expiration</div>
+                    </div>
+                </div>
+
+                {# Breathing Timer #}
+                <div class="flex flex-col items-center gap-8">
+                    {# Visual breathing circle #}
+                    <div class="relative w-48 h-48 flex items-center justify-center">
+                        <div id="breathing-circle" class="absolute w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary opacity-20"></div>
+                        <div class="relative z-10 text-center">
+                            <div id="breaths-remaining" class="text-sm text-gray-600 dark:text-gray-400 mb-2">Cycles restants: <span id="cycles-count">{{ exercise.cycles }}</span></div>
+                            <div id="phase-text" class="text-lg font-semibold text-secondary">En attente...</div>
+                            <div id="timer" class="text-4xl font-bold mt-2">0</div>
+                        </div>
+                    </div>
+
+                    {# Controls #}
+                    <div class="flex gap-4">
+                        <button id="start-btn" class="bg-secondary text-white px-6 py-3 rounded hover:opacity-90 transition-opacity">
+                            Commencer
+                        </button>
+                        <button id="reset-btn" class="bg-gray-400 text-white px-6 py-3 rounded hover:opacity-90 transition-opacity">
+                            Réinitialiser
+                        </button>
+                    </div>
+
+                    {# Instructions #}
+                    <div class="w-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded p-4">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            <strong>Instructions:</strong> Suivez le timer et les instructions à l'écran. Inspirez pendant {{ exercise.inhaleSeconds }} secondes,
+                            retenez votre souffle pendant {{ exercise.holdSeconds }} secondes, puis expirez pendant {{ exercise.exhaleSeconds }} secondes.
+                            Complétez {{ exercise.cycles }} cycles complets.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const EXERCISE = {
+            inhale: {{ exercise.inhaleSeconds }},
+            hold: {{ exercise.holdSeconds }},
+            exhale: {{ exercise.exhaleSeconds }},
+            cycles: {{ exercise.cycles }}
+        };
+
+        let currentCycle = 0;
+        let isRunning = false;
+        let currentPhase = 'inhale'; // inhale, hold, exhale
+        let timeRemaining = 0;
+
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const timerDisplay = document.getElementById('timer');
+        const phaseText = document.getElementById('phase-text');
+        const cyclesCount = document.getElementById('cycles-count');
+        const breathingCircle = document.getElementById('breathing-circle');
+
+        const phaseTranslations = {
+            inhale: 'Inspirez',
+            hold: 'Retenez',
+            exhale: 'Expirez'
+        };
+
+        function resetExercise() {
+            isRunning = false;
+            currentCycle = 0;
+            currentPhase = 'inhale';
+            timeRemaining = 0;
+            timerDisplay.textContent = '0';
+            phaseText.textContent = 'En attente...';
+            cyclesCount.textContent = EXERCISE.cycles;
+            startBtn.textContent = 'Commencer';
+            startBtn.disabled = false;
+            breathingCircle.style.animation = 'none';
+        }
+
+        function startExercise() {
+            if (isRunning) {
+                isRunning = false;
+                startBtn.textContent = 'Reprendre';
+                return;
+            }
+
+            isRunning = true;
+            startBtn.textContent = 'Pause';
+
+            if (currentCycle === 0 && currentPhase === 'inhale' && timeRemaining === 0) {
+                currentCycle = 1;
+                currentPhase = 'inhale';
+                timeRemaining = EXERCISE.inhale;
+            }
+
+            runPhase();
+        }
+
+        function runPhase() {
+            if (!isRunning) return;
+
+            timerDisplay.textContent = Math.ceil(timeRemaining);
+            phaseText.textContent = phaseTranslations[currentPhase];
+
+            // Update animation
+            updateAnimations();
+
+            timeRemaining -= 0.1;
+
+            if (timeRemaining <= 0) {
+                moveToNextPhase();
+            } else {
+                setTimeout(runPhase, 100);
+            }
+        }
+
+        function moveToNextPhase() {
+            if (currentPhase === 'inhale') {
+                currentPhase = 'hold';
+                timeRemaining = EXERCISE.hold;
+            } else if (currentPhase === 'hold') {
+                currentPhase = 'exhale';
+                timeRemaining = EXERCISE.exhale;
+            } else if (currentPhase === 'exhale') {
+                if (currentCycle < EXERCISE.cycles) {
+                    currentCycle++;
+                    currentPhase = 'inhale';
+                    timeRemaining = EXERCISE.inhale;
+                    cyclesCount.textContent = EXERCISE.cycles - currentCycle;
+                } else {
+                    isRunning = false;
+                    currentCycle = 0;
+                    currentPhase = 'inhale';
+                    timeRemaining = 0;
+                    timerDisplay.textContent = '0';
+                    phaseText.textContent = 'Exercice terminé !';
+                    startBtn.textContent = 'Commencer';
+                    cyclesCount.textContent = EXERCISE.cycles;
+                    breathingCircle.style.animation = 'none';
+                    return;
+                }
+            }
+
+            if (isRunning) {
+                runPhase();
+            }
+        }
+
+        function updateAnimations() {
+            if (currentPhase === 'inhale') {
+                breathingCircle.style.animation = `breatheIn ${EXERCISE.inhale}s linear forwards`;
+            } else if (currentPhase === 'hold') {
+                breathingCircle.style.animation = `none`;
+                breathingCircle.style.transform = 'scale(1.2)';
+            } else if (currentPhase === 'exhale') {
+                breathingCircle.style.animation = `breatheOut ${EXERCISE.exhale}s linear forwards`;
+            }
+        }
+
+        startBtn.addEventListener('click', startExercise);
+        resetBtn.addEventListener('click', resetExercise);
+
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes breatheIn {
+                from { transform: scale(1); }
+                to { transform: scale(1.3); }
+            }
+            @keyframes breatheOut {
+                from { transform: scale(1.3); }
+                to { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        resetExercise();
+    </script>
+{% endblock %}
+

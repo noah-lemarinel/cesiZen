@@ -14,9 +14,11 @@
                     <p class="text-gray-700 mb-6 dark:text-gray-300">CesiZen vous propose des outils simples et éprouvés
                         pour suivre vos émotions, pratiquer la respiration et accéder à des ressources pédagogiques.</p>
                     <div class="flex gap-3">
-                        <a href="/register"
-                           class="inline-block bg-secondary text-white px-5 py-3 rounded-lg font-semibold shadow hover:bg-darkblue transition-colors duration-200 transform hover:-translate-y-0.5">Créer
-                            un Compte</a>
+                        {% if not app.user %}
+                            <a href="/register"
+                               class="inline-block bg-secondary text-white px-5 py-3 rounded-lg font-semibold shadow hover:bg-darkblue transition-colors duration-200 transform hover:-translate-y-0.5">Créer
+                                un Compte</a>
+                        {% endif %}
                         <a href="#"
                            class="inline-block bg-white border border-gray-200 text-darkblue px-5 py-3 rounded-lg font-semibold hover:shadow-md transition-all duration-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white">Découvrir</a>
                     </div>
@@ -64,22 +66,24 @@
         </section>
 
         <!-- Callout / CTA -->
-        <section
-            class="bg-secondary text-white rounded-xl p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 dark:bg-primary">
-            <div>
-                <h3 class="text-xl font-bold">Commencez dès maintenant</h3>
-                <p class="text-sm opacity-90">Créez un compte gratuit et commencez à suivre votre bien-être
-                    aujourd'hui.</p>
-            </div>
-            <div class="flex gap-3">
-                <a href="/register"
-                   class="bg-white text-secondary px-4 py-2 rounded-md font-semibold shadow hover:scale-105 transform transition duration-200 dark:bg-gray-800 dark:text-white">Créer
-                    un Compte</a>
-                <a href="/login"
-                   class="bg-white/20 border border-white/30 text-white px-4 py-2 rounded-md font-semibold hover:bg-white/30 transition-colors duration-200">Se
-                    Connecter</a>
-            </div>
-        </section>
+        {% if not app.user %}
+            <section
+                class="bg-secondary text-white rounded-xl p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 dark:bg-primary">
+                <div>
+                    <h3 class="text-xl font-bold">Commencez dès maintenant</h3>
+                    <p class="text-sm opacity-90">Créez un compte gratuit et commencez à suivre votre bien-être
+                        aujourd'hui.</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="/register"
+                       class="bg-white text-secondary px-4 py-2 rounded-md font-semibold shadow hover:scale-105 transform transition duration-200 dark:bg-gray-800 dark:text-white">Créer
+                        un Compte</a>
+                    <a href="/login"
+                       class="bg-white/20 border border-white/30 text-white px-4 py-2 rounded-md font-semibold hover:bg-white/30 transition-colors duration-200">Se
+                        Connecter</a>
+                </div>
+            </section>
+        {% endif %}
 
         <!-- Additional info / report sample -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">

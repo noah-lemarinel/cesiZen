@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Emotions{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-3xl mx-auto bg-white/60 dark:bg-gray-800 rounded p-6 shadow">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-2xl font-semibold">Emotions</h1>
+                <a href="{{ path('admin_emotion_new') }}" class="bg-secondary text-white px-3 py-2 rounded">Créer une émotion</a>
+            </div>
+
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr>
+                        <th class="py-2">Nom</th>
+                        <th class="py-2">Couleur</th>
+                        <th class="py-2">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emotion in emotions %}
+                        <tr class="border-t">
+                            <td class="py-2">{{ emotion.name }}</td>
+                            <td class="py-2">
+                                <span class="inline-block w-6 h-6 rounded" style="background: {{ emotion.color ?: '#ccc' }}"></span>
+                                <span class="ml-2 text-sm text-gray-600">{{ emotion.color ?: '—' }}</span>
+                            </td>
+                            <td class="py-2 text-sm text-gray-600">{{ emotion.description }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="py-4 text-center text-gray-500">Aucune émotion définie.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+

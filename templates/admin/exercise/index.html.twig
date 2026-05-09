@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Exercices de respiration{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-4xl mx-auto bg-white/60 dark:bg-gray-800 rounded p-6 shadow">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-2xl font-semibold">Exercices de respiration</h1>
+                <a href="{{ path('admin_exercise_new') }}" class="bg-secondary text-white px-3 py-2 rounded">Créer un exercice</a>
+            </div>
+
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr>
+                        <th class="py-2">Nom</th>
+                        <th class="py-2">Description</th>
+                        <th class="py-2">Cycle</th>
+                        <th class="py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exercise in exercises %}
+                        <tr class="border-t">
+                            <td class="py-2 font-medium">{{ exercise.name }}</td>
+                            <td class="py-2 text-sm text-gray-600 dark:text-gray-400">{{ exercise.description[:50] }}{{ exercise.description|length > 50 ? '...' : '' }}</td>
+                            <td class="py-2 text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">{{ exercise.inhaleSeconds }}s - {{ exercise.holdSeconds }}s - {{ exercise.exhaleSeconds }}s ({{ exercise.cycles }}x)</span>
+                            </td>
+                            <td class="py-2">
+                                <a href="{{ path('admin_exercise_edit', {'id': exercise.id}) }}" class="text-secondary text-sm hover:underline">Modifier</a>
+                                <form method="POST" action="{{ path('admin_exercise_delete', {'id': exercise.id}) }}" class="inline" onsubmit="return confirm('Êtes-vous sûr ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ exercise.id) }}">
+                                    <button type="submit" class="text-alert text-sm hover:underline ml-2">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-gray-500">Aucun exercice défini.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+

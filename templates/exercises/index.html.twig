@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Exercices de respiration{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div>
+            <h1 class="text-3xl font-semibold mb-2">Exercices de respiration</h1>
+            <p class="text-gray-600 dark:text-gray-300 mb-8">Découvrez nos exercices de respiration guidée pour vous aider à vous détendre et à gérer votre stress.</p>
+        </div>
+
+        {% if exercises %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for exercise in exercises %}
+                    <div class="bg-white/60 dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                        <h2 class="text-xl font-semibold mb-2">{{ exercise.name }}</h2>
+
+                        {% if exercise.description %}
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">{{ exercise.description }}</p>
+                        {% endif %}
+
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded p-3 mb-4 text-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-gray-700 dark:text-gray-300"><strong>Respiration:</strong></span>
+                                <span class="font-mono text-secondary">{{ exercise.inhaleSeconds }}s - {{ exercise.holdSeconds }}s - {{ exercise.exhaleSeconds }}s</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700 dark:text-gray-300"><strong>Cycles:</strong></span>
+                                <span class="font-mono text-secondary">{{ exercise.cycles }}</span>
+                            </div>
+                        </div>
+
+                        <a href="{{ path('exercises_show', {'id': exercise.id}) }}" class="inline-block bg-secondary text-white px-4 py-2 rounded hover:opacity-90 transition-opacity">
+                            Commencer
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white/60 dark:bg-gray-800 rounded p-6 text-center">
+                <p class="text-gray-600 dark:text-gray-400">Aucun exercice disponible pour le moment.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
