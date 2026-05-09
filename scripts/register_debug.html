@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>S'inscrire - CesiZen</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+                <!-- Tailwind CDN for quick styling -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+          /* Small helper to ensure body background transition on theme switch */
+          html { transition: background-color 200ms ease-in-out; }
+        </style>
+        
+                <!-- theme toggle script is included on pages that need it -->
+            </head>
+    <body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <header class="bg-primary text-white p-4 dark:bg-gray-800">
+            <div class="container mx-auto flex items-center justify-between">
+                <a href="/" class="font-bold">CesiZen</a>
+                <div class="flex items-center gap-4">
+                                            <a href="/login" class="text-sm">Se connecter</a>
+                        <a href="/register" class="text-sm">S'inscrire</a>
+                                    </div>
+            </div>
+        </header>
+
+        <div class="min-h-screen flex items-center justify-center bg-lightgray dark:bg-darkblue">
+  <div class="bg-white rounded-xl shadow-md p-8 w-full max-w-md dark:bg-gray-800">
+    <h2 class="text-2xl font-bold mb-4 dark:text-white">Créer un compte</h2>
+
+    
+    <form id="register-form" method="post">
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-medium mb-1 dark:text-white">Nom</label>
+        <input id="name" name="name" type="text" value="" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white">
+      </div>
+
+      <div class="mb-4">
+        <label for="email" class="block text-sm font-medium mb-1 dark:text-white">Email</label>
+        <input id="email" name="email" type="email" value="" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium mb-1 dark:text-white">Mot de passe</label>
+        <input id="password" name="password" type="password" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <button type="submit" class="bg-secondary text-white px-4 py-2 rounded-md font-semibold">S'inscrire</button>
+        <a href="/login" class="text-sm text-gray-600 hover:underline dark:text-gray-300">Déjà un compte ? Se connecter</a>
+      </div>
+    </form>
+  </div>
+</div>
+    </body>
+</html>
