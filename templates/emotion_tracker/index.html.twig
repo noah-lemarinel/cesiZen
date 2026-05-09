@@ -16,7 +16,8 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {# Create Emotion Form #}
+            {% if emotionForm and app.user and app.user.isAdmin() %}
+            {# Create Emotion Form - Admin Only #}
             <aside class="md:col-span-1 bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
                 <h2 class="text-lg font-medium mb-3">Créer une nouvelle émotion</h2>
                 {{ form_start(emotionForm, {'attr': {'class': 'space-y-3'}}) }}
@@ -36,8 +37,8 @@
                 {{ form_end(emotionForm) }}
             </aside>
 
-            {# Emotions List #}
-            <aside class="md:col-span-3 bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+            {# Emotions List - Adjusted layout #}
+            <aside class="{% if emotionForm and app.user and app.user.isAdmin() %}md:col-span-3{% else %}md:col-span-4{% endif %} bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
                 <h2 class="text-lg font-medium mb-3">Palette d'émotions</h2>
                 <ul class="space-y-2">
                     {% for entry in emotions %}
@@ -56,6 +57,28 @@
                     {% endfor %}
                 </ul>
             </aside>
+            {% else %}
+            {# Emotions List - Full width for non-admins #}
+            <aside class="md:col-span-4 bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h2 class="text-lg font-medium mb-3">Palette d'émotions</h2>
+                <ul class="space-y-2">
+                    {% for entry in emotions %}
+                        {% set emotion = entry.emotion %}
+                        {% set color = emotion.color is not empty ? emotion.color : palette[loop.index0 % palette|length] %}
+                        <li class="flex items-center gap-3">
+                            <span class="w-4 h-4 rounded-full" style="background: {{ color }}"></span>
+                            <div>
+                                <div class="font-medium">{{ emotion.name }}</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-400">{{ emotion.description }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-500">{{ entry.createdAt|format_datetime('long', 'short') }}</div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="text-sm text-gray-500">Aucune émotion trouvée. Ajoutez-en une !</li>
+                    {% endfor %}
+                </ul>
+            </aside>
+            {% endif %}
         </div>
 
         {# Export emotion data to JS for the visualization script #}

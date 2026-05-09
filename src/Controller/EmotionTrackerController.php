@@ -20,23 +20,26 @@ class EmotionTrackerController extends AbstractController
     {
         $emotions = $emotionEntryRepository->findAll();
 
-        // Create emotion form
-        $emotionForm = $this->createForm(EmotionType::class);
-        $emotionForm->handleRequest($request);
+        $emotionForm = null;
+        // Only allow admins to create emotions
+        if ($this->getUser() && $this->getUser()->isAdmin()) {
+            $emotionForm = $this->createForm(EmotionType::class);
+            $emotionForm->handleRequest($request);
 
-        if ($emotionForm->isSubmitted() && $emotionForm->isValid()) {
-            $emotion = $emotionForm->getData();
-            $entityManager->persist($emotion);
-            $entityManager->flush();
+            if ($emotionForm->isSubmitted() && $emotionForm->isValid()) {
+                $emotion = $emotionForm->getData();
+                $entityManager->persist($emotion);
+                $entityManager->flush();
 
-            $this->addFlash('success', sprintf('Émotion "%s" créée.', $emotion->getName()));
+                $this->addFlash('success', sprintf('Émotion "%s" créée.', $emotion->getName()));
 
-            return $this->redirectToRoute('emotion_tracker_index');
+                return $this->redirectToRoute('emotion_tracker_index');
+            }
         }
 
         return $this->render('emotion_tracker/index.html.twig', [
             'emotions' => $emotions,
-            'emotionForm' => $emotionForm->createView(),
+            'emotionForm' => $emotionForm ? $emotionForm->createView() : null,
         ]);
     }
 
