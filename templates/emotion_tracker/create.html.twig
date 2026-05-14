@@ -1,0 +1,198 @@
+{# templates/emotion_tracker/create.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une Émotion - Admin{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-semibold">Créer une Émotion</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Ajoutez une nouvelle émotion à la palette.</p>
+            </div>
+            <a href="{{ path('emotion_tracker_index') }}" class="bg-secondary text-white px-4 py-2 rounded shadow hover:bg-secondary/90">← Retour</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {# Formulaire de création #}
+            <div class="bg-white/60 dark:bg-gray-800 rounded p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Informations de l'émotion</h2>
+
+                {{ form_start(emotionForm, {'attr': {'class': 'space-y-4'}}) }}
+                    <div>
+                        {{ form_label(emotionForm.name, 'Nom de l\'émotion *') }}
+                        {{ form_widget(emotionForm.name, {
+                            'attr': {
+                                'class': 'w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary',
+                                'placeholder': 'Ex: Joie, Gratitude, Frustration...'
+                            }
+                        }) }}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nom unique et descriptif de l'émotion</p>
+                        {{ form_errors(emotionForm.name) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(emotionForm.parent, 'Émotion parente') }}
+                        {{ form_widget(emotionForm.parent, {
+                            'attr': {
+                                'class': 'w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'
+                            }
+                        }) }}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Sélectionner une émotion parent si c'est une sous-émotion (niveau 2). Laisser vide pour une émotion primaire (niveau 1).</p>
+                        {{ form_errors(emotionForm.parent) }}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            {{ form_label(emotionForm.color, 'Couleur') }}
+                            <div class="flex gap-2 items-center">
+                                {{ form_widget(emotionForm.color, {
+                                    'attr': {
+                                        'class': 'w-16 h-12 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer',
+                                        'id': 'emotion-color'
+                                    }
+                                }) }}
+                                <div id="color-preview" class="w-12 h-12 rounded-lg border-2 border-gray-300 dark:border-gray-600" style="background-color: #888888;"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Code couleur hex</p>
+                            {{ form_errors(emotionForm.color) }}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aperçu</label>
+                            <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-center">
+                                <div id="preview-name" class="font-semibold text-gray-800 dark:text-white">Émotion</div>
+                                <div id="preview-type" class="text-xs text-gray-600 dark:text-gray-400 mt-1">(niveau 1)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        {{ form_label(emotionForm.description, 'Description') }}
+                        {{ form_widget(emotionForm.description, {
+                            'attr': {
+                                'class': 'w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary',
+                                'placeholder': 'Brève description de cette émotion...',
+                                'rows': 3
+                            }
+                        }) }}
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Description optionnelle pour les utilisateurs</p>
+                        {{ form_errors(emotionForm.description) }}
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" class="flex-1 bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-primary/90 font-medium">
+                            ✓ Créer l'émotion
+                        </button>
+                        <a href="{{ path('emotion_tracker_index') }}" class="flex-1 text-center bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white px-6 py-2 rounded-lg shadow hover:bg-gray-400 dark:hover:bg-gray-600 font-medium">
+                            ✕ Annuler
+                        </a>
+                    </div>
+                {{ form_end(emotionForm) }}
+            </div>
+
+            {# Guide et informations #}
+            <div class="space-y-6">
+                {# Aide sur les niveaux #}
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-3">📚 Niveaux d'émotions</h3>
+                    <div class="space-y-3 text-sm text-blue-800 dark:text-blue-200">
+                        <div>
+                            <div class="font-medium">Niveau 1 : Émotion Primaire</div>
+                            <div class="text-xs">Émotion générale principale (ex: Joie, Colère)</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400">Laisser le champ "Parent" vide</div>
+                        </div>
+                        <div>
+                            <div class="font-medium">Niveau 2 : Émotion Secondaire</div>
+                            <div class="text-xs">Émotion spécifique et nuancée (ex: Gratitude, Frustration)</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400">Sélectionner une émotion parente</div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Guide des couleurs #}
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <h3 class="font-semibold text-green-900 dark:text-green-100 mb-3">🎨 Guide des couleurs</h3>
+                    <div class="space-y-2 text-sm text-green-800 dark:text-green-200">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded" style="background-color: #FFD700;"></div>
+                            <span>Joie : Or vif (#FFD700)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded" style="background-color: #FF0000;"></div>
+                            <span>Colère : Rouge (#FF0000)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded" style="background-color: #8B008B;"></div>
+                            <span>Peur : Violet (#8B008B)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded" style="background-color: #00008B;"></div>
+                            <span>Tristesse : Bleu foncé (#00008B)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded" style="background-color: #FFA500;"></div>
+                            <span>Surprise : Orange (#FFA500)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded" style="background-color: #228B22;"></div>
+                            <span>Dégoût : Vert foncé (#228B22)</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Bonnes pratiques #}
+                <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                    <h3 class="font-semibold text-purple-900 dark:text-purple-100 mb-3">✨ Bonnes pratiques</h3>
+                    <ul class="space-y-2 text-xs text-purple-800 dark:text-purple-200">
+                        <li>✓ Utiliser des noms clairs et concis</li>
+                        <li>✓ Grouper les secondaires sous une primaire</li>
+                        <li>✓ Ajouter une description courte</li>
+                        <li>✓ Utiliser des couleurs cohérentes</li>
+                        <li>✓ Limiter à 6 émotions primaires</li>
+                        <li>✓ Créer 5-7 secondaires par primaire</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mise à jour du prévisualisation en temps réel
+        const colorInput = document.getElementById('emotion-color');
+        const nameInput = document.querySelector('input[name*="name"]');
+        const parentSelect = document.querySelector('select[name*="parent"]');
+        const colorPreview = document.getElementById('color-preview');
+        const previewName = document.getElementById('preview-name');
+        const previewType = document.getElementById('preview-type');
+
+        function updatePreview() {
+            // Mettre à jour la couleur
+            if (colorInput.value) {
+                colorPreview.style.backgroundColor = colorInput.value;
+            }
+
+            // Mettre à jour le nom
+            if (nameInput && nameInput.value) {
+                previewName.textContent = nameInput.value;
+            } else {
+                previewName.textContent = 'Émotion';
+            }
+
+            // Mettre à jour le type (primaire/secondaire)
+            if (parentSelect && parentSelect.value) {
+                previewType.textContent = '(niveau 2 - Secondaire)';
+            } else {
+                previewType.textContent = '(niveau 1 - Primaire)';
+            }
+        }
+
+        colorInput.addEventListener('change', updatePreview);
+        nameInput.addEventListener('input', updatePreview);
+        parentSelect.addEventListener('change', updatePreview);
+
+        // Initialiser l'aperçu
+        updatePreview();
+    </script>
+{% endblock %}
+

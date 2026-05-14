@@ -1,0 +1,60 @@
+{# templates/emotion_tracker/journal.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal de Bord - Tracker d'Émotions{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-semibold">Journal de Bord</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Vos émotions enregistrées.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ path('emotion_tracker_add') }}" class="bg-secondary text-white px-4 py-2 rounded shadow hover:bg-secondary/90">Ajouter une émotion</a>
+                <a href="{{ path('emotion_tracker_report') }}" class="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary/90">Voir le rapport</a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            {% if emotions %}
+                {% for entry in emotions %}
+                    {% set emotion = entry.emotion %}
+                    {% set parentColor = emotion.parent ? emotion.parent.color : emotion.color %}
+                    <div class="flex items-start gap-4 bg-white/60 dark:bg-gray-800 rounded p-4 shadow hover:shadow-md transition-shadow">
+                        <div class="flex-shrink-0">
+                            <span class="inline-block w-6 h-6 rounded-full" style="background: {{ parentColor ?? '#888888' }}"></span>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    {% if emotion.parent %}
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ emotion.parent.name }}</div>
+                                        <div class="font-semibold text-lg">{{ emotion.name }}</div>
+                                    {% else %}
+                                        <div class="font-semibold text-lg">{{ emotion.name }}</div>
+                                    {% endif %}
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ entry.createdAt|format_datetime('full', 'short') }}</div>
+                                </div>
+                                <form method="post" action="{{ path('emotion_tracker_delete', {id: entry.id}) }}" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette émotion ?');">
+                                    <button type="submit" class="text-red-600 hover:text-red-800 dark:hover:text-red-400 text-sm font-medium">Supprimer</button>
+                                </form>
+                            </div>
+                            {% if entry.notes %}
+                                <div class="mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-700 dark:text-gray-200">
+                                    {{ entry.notes }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="bg-white/60 dark:bg-gray-800 rounded p-8 shadow text-center">
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Vous n'avez pas encore enregistré d'émotions.</p>
+                    <a href="{{ path('emotion_tracker_add') }}" class="inline-block bg-secondary text-white px-6 py-2 rounded shadow hover:bg-secondary/90">Ajouter votre première émotion</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

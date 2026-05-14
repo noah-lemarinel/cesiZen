@@ -1,10 +1,143 @@
 {# templates/emotion_tracker/report.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Emotion Report{% endblock %}
+{% block title %}Rapport d'Émotions{% endblock %}
 
 {% block body %}
-    <h1>Emotion Report</h1>
-    {# Placeholder for report content #}
-    <p>This is where the emotion report will be displayed.</p>
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-semibold">Rapport d'Émotions</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Analysez vos émotions sur la période sélectionnée.</p>
+            </div>
+            <a href="{{ path('emotion_tracker_index') }}" class="bg-secondary text-white px-4 py-2 rounded shadow hover:bg-secondary/90">Retour au journal</a>
+        </div>
+
+        {# Period selector #}
+        <div class="mb-6 bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+            <h2 class="font-semibold mb-3">Sélectionner une période</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ path('emotion_tracker_report', {period: 'week'}) }}" class="px-4 py-2 rounded border {% if period == 'week' %}bg-primary text-white border-primary{% else %}border-gray-300 dark:border-gray-600 hover:border-primary{% endif %}">
+                    Cette semaine
+                </a>
+                <a href="{{ path('emotion_tracker_report', {period: 'month'}) }}" class="px-4 py-2 rounded border {% if period == 'month' %}bg-primary text-white border-primary{% else %}border-gray-300 dark:border-gray-600 hover:border-primary{% endif %}">
+                    Ce mois
+                </a>
+                <a href="{{ path('emotion_tracker_report', {period: 'quarter'}) }}" class="px-4 py-2 rounded border {% if period == 'quarter' %}bg-primary text-white border-primary{% else %}border-gray-300 dark:border-gray-600 hover:border-primary{% endif %}">
+                    Ce trimestre
+                </a>
+                <a href="{{ path('emotion_tracker_report', {period: 'year'}) }}" class="px-4 py-2 rounded border {% if period == 'year' %}bg-primary text-white border-primary{% else %}border-gray-300 dark:border-gray-600 hover:border-primary{% endif %}">
+                    Cette année
+                </a>
+            </div>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mt-3">
+                Période : <strong>{{ startDate|format_date('long') }}</strong> à <strong>{{ endDate|format_date('long') }}</strong>
+            </p>
+        </div>
+
+        {# Statistics #}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {# Total entries #}
+            <div class="bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h3 class="text-lg font-semibold mb-2">Résumé</h3>
+                <div class="text-3xl font-bold text-primary">{{ totalEntries }}</div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">entrées enregistrées</p>
+            </div>
+
+            {# Most common primary emotion #}
+            <div class="bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h3 class="text-lg font-semibold mb-2">Émotion Dominante</h3>
+                {% if emotionsByParent|length > 0 %}
+                    {% set firstEmotion = emotionsByParent|first %}
+                    {% set firstEmotionName = emotionsByParent|keys|first %}
+                    <div class="text-2xl font-bold">{{ firstEmotionName }}</div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ firstEmotion }} occurrences</p>
+                {% else %}
+                    <p class="text-gray-600 dark:text-gray-400">Aucune donnée</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Charts #}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {# Primary emotions chart #}
+            <div class="bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h3 class="text-lg font-semibold mb-4">Émotions Principales</h3>
+                {% if emotionsByParent|length > 0 %}
+                    <div class="space-y-3">
+                        {% set maxCount = emotionsByParent|first %}
+                        {% for emotionName, count in emotionsByParent %}
+                            {% set percentage = (count / maxCount * 100)|round %}
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium">{{ emotionName }}</span>
+                                    <span class="text-gray-600 dark:text-gray-400">{{ count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full" style="width: {{ percentage }}%"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-600 dark:text-gray-400">Aucune donnée</p>
+                {% endif %}
+            </div>
+
+            {# Secondary emotions chart #}
+            <div class="bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h3 class="text-lg font-semibold mb-4">Émotions Secondaires</h3>
+                {% if emotionCounts|length > 0 %}
+                    <div class="space-y-3">
+                        {% set maxCount = emotionCounts|first %}
+                        {% for emotionName, count in emotionCounts %}
+                            {% set percentage = (count / maxCount * 100)|round %}
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium">{{ emotionName }}</span>
+                                    <span class="text-gray-600 dark:text-gray-400">{{ count }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-secondary h-2 rounded-full" style="width: {{ percentage }}%"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-600 dark:text-gray-400">Aucune donnée</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Detailed entries timeline #}
+        {% if entries|length > 0 %}
+            <div class="mt-6 bg-white/60 dark:bg-gray-800 rounded p-4 shadow">
+                <h3 class="text-lg font-semibold mb-4">Historique Détaillé</h3>
+                <div class="space-y-3">
+                    {% for entry in entries %}
+                        {% set emotion = entry.emotion %}
+                        {% set parentColor = emotion.parent ? emotion.parent.color : emotion.color %}
+                        <div class="flex items-start gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+                            <span class="inline-block w-4 h-4 rounded-full mt-1" style="background: {{ parentColor ?? '#888888' }}; flex-shrink: 0;"></span>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        {% if emotion.parent %}
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ emotion.parent.name }}</span>
+                                            <span class="mx-2 text-gray-400">›</span>
+                                        {% endif %}
+                                        <span class="font-medium">{{ emotion.name }}</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{ entry.createdAt|format_datetime('short', 'short') }}</span>
+                                </div>
+                                {% if entry.notes %}
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ entry.notes }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
