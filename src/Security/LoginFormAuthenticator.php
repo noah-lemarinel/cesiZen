@@ -15,6 +15,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -35,7 +36,16 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
         // Create a Passport with CSRF and password credentials
         $userBadge = new UserBadge($email, function ($userIdentifier) {
-            return $this->em->getRepository(User::class)->findOneBy(['email' => $userIdentifier]);
+            $user = $this->em->getRepository(User::class)->findOneBy(['email' => $userIdentifier]);
+
+            // Check if user is active
+            if ($user && !$user->isActive()) {
+                throw new \Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException(
+                    'Votre compte a été désactivé. Veuillez contacter un administrateur.'
+                );
+            }
+
+            return $user;
         });
 
         $passwordCredentials = new PasswordCredentials($password);

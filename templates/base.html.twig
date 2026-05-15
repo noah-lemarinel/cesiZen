@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CesiZen{% endblock %}</title>
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
@@ -10,6 +11,14 @@
         <style>
             html {
                 transition: background-color 200ms ease-in-out;
+            }
+
+            #dropdown-icon {
+                transition: transform 200ms ease-in-out;
+            }
+
+            #menu-icon {
+                transition: transform 200ms ease-in-out;
             }
         </style>
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -39,70 +48,99 @@
         <script defer src="{{ asset('js/theme-toggle.js') }}"></script>
     {% endblock %}
 </head>
-<body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-<header class="bg-primary text-white p-4 dark:bg-secondary shadow-md">
-    <div class="container mx-auto px-6 py-6 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-            <div class="rounded-full bg-white/20 p-2 flex-shrink-0">
+<body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white flex flex-col min-h-screen">
+<header class="bg-primary text-white dark:bg-secondary shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/">
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <div class="rounded-full bg-white/20 p-2">
                 <!-- simple logo mark -->
-                <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                      aria-hidden="true">
                     <circle cx="12" cy="12" r="9" fill="white" fill-opacity="0.15"></circle>
                     <path d="M8 13c1.2 1 2.8 1 4 0 1.2-1 2-3 2-3s-1.6-1-3-1c-1.4 0-3 1-3 1s-.2 2 .0 3z" fill="white"
                           fill-opacity="0.9"></path>
                 </svg>
             </div>
-            <div>
-                <h1 class="text-2xl font-semibold">CesiZen</h1>
-                <p class="text-sm opacity-90">Votre compagnon pour une meilleure santé mentale</p>
+            <div class="hidden sm:block">
+                <h1 class="text-xl font-semibold">CesiZen</h1>
+                <p class="text-xs opacity-90">Santé mentale</p>
             </div>
         </div>
-        <nav class="hidden md:flex items-center gap-4">
+        </a>
+
+        <!-- Desktop Navbar -->
+        <nav class="hidden md:flex items-center gap-1">
             <a href="/"
-               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Accueil</a>
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Accueil</a>
             <a href="/emotion/tracker"
-               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Tracker
-                d'Émotions</a>
-            <a href="{{ path('exercises_index') }}" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Exercices</a>
-            <a href="{{ path('resources_index') }}" class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Ressources</a>
-            <a href="#"
-               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200">Contact</a>
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Tracker</a>
+            <a href="{{ path('exercises_index') }}"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Exercices</a>
+            <a href="{{ path('resources_index') }}"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Ressources</a>
         </nav>
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-4">
-                {% if app.user %}
-                    <span
-                        class="text-sm">Connecté en tant que {{ app.user.name ?? app.user.userIdentifier }}</span>
-                    <a href="{{ path('app_logout') }}" class="bg-white text-secondary px-3 py-1 rounded">Se
-                        déconnecter</a>
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="text-sm">Se connecter</a>
-                    <a href="{{ path('app_register') }}" class="text-sm">S'inscrire</a>
-                {% endif %}
-            </div>
+
+        <!-- Right side: Theme toggle, User dropdown, Burger menu -->
+        <div class="flex items-center gap-2">
             <!-- Theme toggle -->
             <button id="theme-toggle"
                     class="p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
                     aria-label="Basculer le thème" aria-pressed="false">
                 <!-- Moon (light mode) -->
-                <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                     viewBox="0 0 24 24"
-                     stroke="currentColor">
+                <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
                 </svg>
                 <!-- Sun (dark mode) -->
-                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none"
                      viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M7.05 7.05L5.63 5.63m12.02 0l-1.42 1.42M7.05 16.95l-1.42 1.42M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
             </button>
 
-            <button class="md:hidden p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
+            <!-- User Dropdown (Desktop) -->
+            <div class="hidden md:relative md:block">
+                {% if app.user %}
+                    <button id="user-menu-trigger"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <span>{{ app.user.name ?? app.user.userIdentifier }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200"
+                             id="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                        </svg>
+                    </button>
+                    <div id="user-dropdown"
+                         class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-lg z-50">
+                        <a href="{{ path('app_account') }}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">Mon Compte</a>
+                        <hr class="border-gray-200 dark:border-gray-700">
+                        <a href="{{ path('app_logout') }}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-red-600 dark:text-red-400">Se
+                            déconnecter</a>
+                    </div>
+                {% else %}
+                    <a href="{{ path('app_login') }}"
+                       class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Se
+                        connecter</a>
+                    <a href="{{ path('app_register') }}"
+                       class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">S'inscrire</a>
+                {% endif %}
+            </div>
+
+            <!-- Burger Menu Button (Mobile) -->
+            <button id="mobile-menu-trigger"
+                    class="md:hidden p-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200"
                     aria-label="Menu">
-                <!-- hamburger -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menu-icon" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4 6h16M4 12h16M4 18h16"></path>
@@ -110,16 +148,104 @@
             </button>
         </div>
     </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-primary dark:bg-secondary border-t border-white/20">
+        <nav class="container mx-auto px-4 py-3 flex flex-col gap-1">
+            <a href="/"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Accueil</a>
+            <a href="/emotion/tracker"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Tracker
+                d'Émotions</a>
+            <a href="{{ path('exercises_index') }}"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Exercices</a>
+            <a href="{{ path('resources_index') }}"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Ressources</a>
+            <a href="#"
+               class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Contact</a>
+
+            <hr class="border-white/20 my-2">
+
+            {% if app.user %}
+                <div class="px-3 py-2 text-sm text-white/80">{{ app.user.name ?? app.user.userIdentifier }}</div>
+                <a href="{{ path('app_account') }}"
+                   class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Mon
+                    Compte</a>
+                <a href="{{ path('app_logout') }}"
+                   class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Se
+                    déconnecter</a>
+            {% else %}
+                <a href="{{ path('app_login') }}"
+                   class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">Se
+                    connecter</a>
+                <a href="{{ path('app_register') }}"
+                   class="px-3 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 text-sm">S'inscrire</a>
+            {% endif %}
+        </nav>
+    </div>
 </header>
 
-{% block body %}{% endblock %}
+<main class="flex-1">
+    {% block body %}{% endblock %}
+</main>
 
-<footer class="bg-darkblue text-white mt-12 dark:bg-black">
+<footer class="bg-darkblue text-white dark:bg-black">
     <div class="container mx-auto px-6 py-6 text-center">
         <p class="text-sm">&copy; 2026 CesiZen. Tous droits réservés.</p>
         <p class="text-xs opacity-80 mt-2">Made with care — ressources et exercices non substitutifs à un avis
             médical.</p>
     </div>
 </footer>
+
+<script>
+    // Mobile menu toggle
+    const mobileMenuTrigger = document.getElementById('mobile-menu-trigger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+
+    mobileMenuTrigger.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        menuIcon.style.transform = mobileMenu.classList.contains('hidden') ? 'rotate(0)' : 'rotate(180deg)';
+    });
+
+    // Close mobile menu when clicking on a link
+    const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+    mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            menuIcon.style.transform = 'rotate(0)';
+        });
+    });
+
+    // User dropdown toggle (Desktop)
+    const userMenuTrigger = document.getElementById('user-menu-trigger');
+    const userDropdown = document.getElementById('user-dropdown');
+    const dropdownIcon = document.getElementById('dropdown-icon');
+
+    if (userMenuTrigger && userDropdown && dropdownIcon) {
+        userMenuTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('hidden');
+            dropdownIcon.style.transform = userDropdown.classList.contains('hidden') ? 'rotate(0)' : 'rotate(180deg)';
+        });
+
+        // Close dropdown when clicking on a link
+        const dropdownLinks = userDropdown.querySelectorAll('a');
+        dropdownLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                userDropdown.classList.add('hidden');
+                dropdownIcon.style.transform = 'rotate(0)';
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.add('hidden');
+                dropdownIcon.style.transform = 'rotate(0)';
+            }
+        });
+    }
+</script>
 </body>
 </html>

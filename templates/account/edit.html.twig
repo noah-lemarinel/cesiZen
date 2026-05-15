@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier les Informations - CesiZen{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-6 py-12">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Modifier les Informations</h1>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            {{ form_start(form) }}
+
+            <div class="mb-6">
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name) }}
+                {% if form.name.vars.errors %}
+                    <div class="text-red-600 text-sm mt-1">
+                        {{ form_errors(form.name) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-6">
+                {{ form_label(form.email) }}
+                {{ form_widget(form.email) }}
+                {% if form.email.vars.errors %}
+                    <div class="text-red-600 text-sm mt-1">
+                        {{ form_errors(form.email) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition-colors">
+                    Enregistrer les Modifications
+                </button>
+                <a href="{{ path('app_account') }}" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                    Annuler
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

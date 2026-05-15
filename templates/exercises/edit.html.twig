@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un exercice de respiration{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-2xl mx-auto bg-white/60 dark:bg-gray-800 rounded p-6 shadow">
+            <h1 class="text-2xl font-semibold mb-6">Modifier "{{ exercise.name }}"</h1>
+
+            {{ form_start(form) }}
+            <div class="space-y-4">
+                {# Name field #}
+                <div>
+                    {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                    {{ form_widget(form.name, {
+                        'attr': {
+                            'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700'
+                        }
+                    }) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                {# Description field #}
+                <div>
+                    {{ form_label(form.description, null, {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                    {{ form_widget(form.description, {
+                        'attr': {
+                            'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700'
+                        }
+                    }) }}
+                    {{ form_errors(form.description) }}
+                </div>
+
+                {# Breathing timing fields in a grid #}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        {{ form_label(form.inhaleSeconds, null, {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                        {{ form_widget(form.inhaleSeconds, {
+                            'attr': {
+                                'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700',
+                                'type': 'number',
+                                'min': '1'
+                            }
+                        }) }}
+                        {{ form_errors(form.inhaleSeconds) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.holdSeconds, null, {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                        {{ form_widget(form.holdSeconds, {
+                            'attr': {
+                                'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700',
+                                'type': 'number',
+                                'min': '0'
+                            }
+                        }) }}
+                        {{ form_errors(form.holdSeconds) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.exhaleSeconds, null, {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                        {{ form_widget(form.exhaleSeconds, {
+                            'attr': {
+                                'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700',
+                                'type': 'number',
+                                'min': '1'
+                            }
+                        }) }}
+                        {{ form_errors(form.exhaleSeconds) }}
+                    </div>
+                </div>
+
+                {# Cycles field #}
+                <div>
+                    {{ form_label(form.cycles, null, {'label_attr': {'class': 'block text-sm font-medium mb-1'}}) }}
+                    {{ form_widget(form.cycles, {
+                        'attr': {
+                            'class': 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700',
+                            'type': 'number',
+                            'min': '1'
+                        }
+                    }) }}
+                    {{ form_errors(form.cycles) }}
+                </div>
+
+                <div class="flex items-center gap-4 pt-2">
+                    <button type="submit" class="bg-secondary text-white px-4 py-2 rounded">Modifier</button>
+                    <a href="{{ path('exercises_show', {'id': exercise.id}) }}" class="text-sm text-gray-600 dark:text-gray-400">Annuler</a>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+

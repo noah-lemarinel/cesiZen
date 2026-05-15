@@ -20,4 +20,15 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['email' => $email]);
     }
+
+    public function searchUsers(string $query): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('LOWER(u.email) LIKE LOWER(:query)')
+            ->orWhere('LOWER(u.name) LIKE LOWER(:query)')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('u.email', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
