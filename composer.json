@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^2.18.2",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6.2",
+        "lexik/jwt-authentication-bundle": "^2.20",
         "php-cs-fixer/shim": "^3.94.2",
         "symfony/asset": "7.4.*",
         "symfony/console": "7.4.*",
@@ -41,6 +42,7 @@
     },
     "autoload": {
         "psr-4": {
+            "Symfony\\Component\\Security\\Guard\\": "src/Symfony/Component/Security/Guard/",
             "App\\": "src/"
         }
     },

@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CesiZen — Mobile{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Small mobile-focused container */
+        #mobile-app { padding: 1rem; max-width: 640px; margin: 0 auto; }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script defer src="{{ asset('js/mobile-app.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <div id="mobile-app" class="container">
+        <h2 class="text-2xl font-semibold mb-4">CesiZen Mobile</h2>
+        <div id="mobile-root">Chargement…</div>
+    </div>
+{% endblock %}
+
