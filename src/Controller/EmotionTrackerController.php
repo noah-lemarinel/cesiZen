@@ -3,17 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Emotion;
+use App\Entity\EmotionEntry;
+use App\Entity\User;
 use App\Form\EmotionEntryType;
 use App\Form\EmotionType;
 use App\Repository\EmotionEntryRepository;
 use App\Repository\EmotionRepository;
-use App\Entity\EmotionEntry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EmotionTrackerController extends AbstractController
 {
@@ -24,7 +24,8 @@ class EmotionTrackerController extends AbstractController
         // For regular users, redirect to journal
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        if (!$this->getUser()->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !$currentUser->isAdmin()) {
             return $this->redirectToRoute('emotion_tracker_journal');
         }
 
@@ -55,7 +56,8 @@ class EmotionTrackerController extends AbstractController
     {
         // Require admin authentication
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        if (!$this->getUser()->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !$currentUser->isAdmin()) {
             throw $this->createAccessDeniedException('Seuls les administrateurs peuvent créer des émotions.');
         }
 
@@ -82,7 +84,8 @@ class EmotionTrackerController extends AbstractController
     {
         // Require admin authentication
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        if (!$this->getUser()->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !$currentUser->isAdmin()) {
             throw $this->createAccessDeniedException('Seuls les administrateurs peuvent supprimer des émotions.');
         }
 
@@ -90,12 +93,14 @@ class EmotionTrackerController extends AbstractController
 
         if (!$emotion) {
             $this->addFlash('error', 'Émotion introuvable.');
+
             return $this->redirectToRoute('emotion_tracker_index');
         }
 
         // Check if emotion has children
         if ($emotion->getChildren()->count() > 0) {
             $this->addFlash('error', sprintf('Impossible de supprimer "%s" car elle contient des sous-émotions. Supprimez d\'abord les sous-émotions.', $emotion->getName()));
+
             return $this->redirectToRoute('emotion_tracker_index');
         }
 
@@ -117,6 +122,11 @@ class EmotionTrackerController extends AbstractController
         // Require authentication
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         // Use a simple form for selecting an existing emotion and adding notes
         $form = $this->createForm(EmotionEntryType::class);
         $form->handleRequest($request);
@@ -128,7 +138,7 @@ class EmotionTrackerController extends AbstractController
             $entry = new EmotionEntry();
             $entry->setEmotion($data['emotion']);
             $entry->setNotes($data['notes'] ?? null);
-            $entry->setUser($this->getUser());
+            $entry->setUser($currentUser);
 
             $entityManager->persist($entry);
             $entityManager->flush();
@@ -149,15 +159,21 @@ class EmotionTrackerController extends AbstractController
         // Require authentication
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $entry = $emotionEntryRepository->find($id);
 
         if (!$entry) {
             $this->addFlash('error', 'Émotion introuvable.');
+
             return $this->redirectToRoute('emotion_tracker_journal');
         }
 
         // Verify ownership
-        if ($entry->getUser() !== $this->getUser()) {
+        if ($entry->getUser() !== $currentUser) {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
             throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer l\'émotion d\'un autre utilisateur.');
         }
@@ -199,12 +215,12 @@ class EmotionTrackerController extends AbstractController
             if (!isset($emotionCounts[$emotion->getName()])) {
                 $emotionCounts[$emotion->getName()] = 0;
             }
-            $emotionCounts[$emotion->getName()]++;
+            ++$emotionCounts[$emotion->getName()];
 
             if (!isset($emotionsByParent[$parentName])) {
                 $emotionsByParent[$parentName] = 0;
             }
-            $emotionsByParent[$parentName]++;
+            ++$emotionsByParent[$parentName];
         }
 
         arsort($emotionCounts);
@@ -224,6 +240,7 @@ class EmotionTrackerController extends AbstractController
     private function getStartDate(string $period): \DateTimeImmutable
     {
         $today = new \DateTimeImmutable();
+
         return match ($period) {
             'week' => $today->modify('-7 days'),
             'month' => $today->modify('-1 month'),

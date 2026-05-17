@@ -55,7 +55,7 @@ class CreateBreathingExercisesCommand extends Command
 
         $count = 0;
         $existingExercises = $this->entityManager->getRepository(BreathingExercise::class)->findAll();
-        $existingNames = array_map(fn($e) => $e->getName(), $existingExercises);
+        $existingNames = array_map(fn ($e) => $e->getName(), $existingExercises);
 
         foreach ($exercisesData as $name => $data) {
             if (!in_array($name, $existingNames)) {
@@ -68,7 +68,7 @@ class CreateBreathingExercisesCommand extends Command
                 $exercise->setCycles($data['cycles']);
 
                 $this->entityManager->persist($exercise);
-                $count++;
+                ++$count;
                 $io->writeln("✓ Créé: {$name}");
             } else {
                 $io->writeln("→ Existe déjà: {$name}");
@@ -78,7 +78,7 @@ class CreateBreathingExercisesCommand extends Command
         $this->entityManager->flush();
 
         $io->success("Exercices de respiration créés avec succès! ({$count} nouveaux exercices créés)");
+
         return Command::SUCCESS;
     }
 }
-

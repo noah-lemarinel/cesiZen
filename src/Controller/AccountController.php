@@ -8,12 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AccountController extends AbstractController
 {
@@ -47,6 +43,7 @@ class AccountController extends AbstractController
             $emailExists = $em->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
             if ($emailExists && $emailExists->getId() !== $user->getId()) {
                 $this->addFlash('error', 'Cette adresse email est déjà utilisée.');
+
                 return $this->render('account/edit.html.twig', [
                     'form' => $form->createView(),
                     'user' => $user,
@@ -83,17 +80,20 @@ class AccountController extends AbstractController
             // Validate current password
             if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
                 $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
+
                 return $this->render('account/password.html.twig');
             }
 
             // Validate new password
             if (strlen($newPassword) < 6) {
                 $this->addFlash('error', 'Le nouveau mot de passe doit contenir au moins 6 caractères.');
+
                 return $this->render('account/password.html.twig');
             }
 
             if ($newPassword !== $confirmPassword) {
                 $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
+
                 return $this->render('account/password.html.twig');
             }
 
@@ -133,4 +133,3 @@ class AccountController extends AbstractController
         return $this->redirectToRoute('app_logout');
     }
 }
-

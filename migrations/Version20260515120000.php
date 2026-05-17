@@ -29,4 +29,3 @@ final class Version20260515120000 extends AbstractMigration
         $this->addSql('ALTER TABLE "user" DROP COLUMN is_active');
     }
 }
-

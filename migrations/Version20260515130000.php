@@ -22,7 +22,7 @@ final class Version20260515130000 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $db = $this->connection->getDatabasePlatform()::class;
 
-        if (strpos($db, 'SQLite') !== false) {
+        if (false !== strpos($db, 'SQLite')) {
             // SQLite requires recreating the table to add a new column with foreign key
             $this->addSql('ALTER TABLE breathing_exercise ADD COLUMN created_by_id INTEGER DEFAULT NULL');
             $this->addSql('CREATE INDEX IDX_42A4FF7CB03A8386 ON breathing_exercise (created_by_id)');
@@ -38,7 +38,7 @@ final class Version20260515130000 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $db = $this->connection->getDatabasePlatform()::class;
 
-        if (strpos($db, 'SQLite') === false) {
+        if (false === strpos($db, 'SQLite')) {
             $this->addSql('ALTER TABLE breathing_exercise DROP FOREIGN KEY FK_42A4FF7CB03A8386');
         }
 
@@ -46,6 +46,3 @@ final class Version20260515130000 extends AbstractMigration
         $this->addSql('ALTER TABLE breathing_exercise DROP COLUMN created_by_id');
     }
 }
-
-
-

@@ -44,4 +44,3 @@ class BreathingExerciseType extends AbstractType
         ]);
     }
 }
-

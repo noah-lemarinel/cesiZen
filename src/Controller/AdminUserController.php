@@ -9,8 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin/users', name: 'admin_users_')]
 class AdminUserController extends AbstractController
@@ -48,6 +48,7 @@ class AdminUserController extends AbstractController
             $existingUser = $em->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
             if ($existingUser) {
                 $this->addFlash('error', 'Un utilisateur avec cette adresse email existe déjà.');
+
                 return $this->render('admin/users/create.html.twig', [
                     'form' => $form->createView(),
                 ]);
@@ -62,6 +63,7 @@ class AdminUserController extends AbstractController
                 $user->setPassword($hashedPassword);
             } else {
                 $this->addFlash('error', 'Le mot de passe est requis.');
+
                 return $this->render('admin/users/create.html.twig', [
                     'form' => $form->createView(),
                 ]);
@@ -85,14 +87,20 @@ class AdminUserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('deactivate_user', $token)) {
             throw $this->createAccessDeniedException();
         }
 
         // Prevent deactivating self
-        if ($user->getId() === $this->getUser()?->getId()) {
+        if ($user->getId() === $currentUser->getId()) {
             $this->addFlash('error', 'Vous ne pouvez pas désactiver votre propre compte.');
+
             return $this->redirectToRoute('admin_users_index');
         }
 
@@ -127,14 +135,20 @@ class AdminUserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('delete_user', $token)) {
             throw $this->createAccessDeniedException();
         }
 
         // Prevent deleting self
-        if ($user->getId() === $this->getUser()?->getId()) {
+        if ($user->getId() === $currentUser->getId()) {
             $this->addFlash('error', 'Vous ne pouvez pas supprimer votre propre compte.');
+
             return $this->redirectToRoute('admin_users_index');
         }
 
@@ -147,4 +161,3 @@ class AdminUserController extends AbstractController
         return $this->redirectToRoute('admin_users_index');
     }
 }
-

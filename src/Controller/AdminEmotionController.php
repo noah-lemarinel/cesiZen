@@ -46,4 +46,3 @@ class AdminEmotionController extends AbstractController
         ]);
     }
 }
-

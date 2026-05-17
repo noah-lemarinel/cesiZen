@@ -66,4 +66,3 @@ class CreateUserCommand extends Command
         return Command::SUCCESS;
     }
 }
-

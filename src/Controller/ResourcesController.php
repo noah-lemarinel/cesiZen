@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\BlogPost;
+use App\Entity\User;
 use App\Form\BlogPostType;
 use App\Repository\BlogPostRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,13 +26,13 @@ class ResourcesController extends AbstractController
         ]);
     }
 
-
     #[Route('/blog/new', name: 'blog_post_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         // Check if user is admin
-        if (!$this->getUser()?->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !$currentUser->isAdmin()) {
             throw $this->createAccessDeniedException('Only admins can create blog posts.');
         }
 
@@ -40,7 +41,7 @@ class ResourcesController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $post->setAuthor($this->getUser());
+            $post->setAuthor($currentUser);
             $post->setUpdatedAt(new \DateTime());
             $em->persist($post);
             $em->flush();
@@ -58,7 +59,8 @@ class ResourcesController extends AbstractController
     #[Route('/blog/{id}', name: 'blog_post_show')]
     public function show(BlogPost $post): Response
     {
-        if (!$post->isPublished() && !$this->getUser()?->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$post->isPublished() && (!$currentUser instanceof User || !$currentUser->isAdmin())) {
             throw $this->createNotFoundException('Ce blog n\'existe pas.');
         }
 
@@ -72,7 +74,8 @@ class ResourcesController extends AbstractController
     public function edit(BlogPost $post, Request $request, EntityManagerInterface $em): Response
     {
         // Check if user is admin
-        if (!$this->getUser()?->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !$currentUser->isAdmin()) {
             throw $this->createAccessDeniedException('Only admins can edit blog posts.');
         }
 
@@ -99,11 +102,12 @@ class ResourcesController extends AbstractController
     public function delete(BlogPost $post, Request $request, EntityManagerInterface $em): Response
     {
         // Check if user is admin
-        if (!$this->getUser()?->isAdmin()) {
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !$currentUser->isAdmin()) {
             throw $this->createAccessDeniedException('Only admins can delete blog posts.');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
             $em->remove($post);
             $em->flush();
 
@@ -113,4 +117,3 @@ class ResourcesController extends AbstractController
         return $this->redirectToRoute('resources_index');
     }
 }
-

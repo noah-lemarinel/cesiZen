@@ -17,7 +17,7 @@ class BlogPostRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all published posts ordered by creation date (newest first)
+     * Find all published posts ordered by creation date (newest first).
      */
     public function findPublished(): array
     {
@@ -29,7 +29,7 @@ class BlogPostRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all posts (published and unpublished, for admin) ordered by creation date (newest first)
+     * Find all posts (published and unpublished, for admin) ordered by creation date (newest first).
      */
     public function findAll(): array
     {
@@ -39,5 +39,3 @@ class BlogPostRepository extends ServiceEntityRepository
             ->getResult();
     }
 }
-
-

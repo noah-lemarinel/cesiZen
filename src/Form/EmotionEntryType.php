@@ -19,8 +19,9 @@ class EmotionEntryType extends AbstractType
                 'choice_label' => function (Emotion $emotion) {
                     // Show parent name for secondary emotions
                     if ($emotion->getParent()) {
-                        return $emotion->getParent()->getName() . ' > ' . $emotion->getName();
+                        return $emotion->getParent()->getName().' > '.$emotion->getName();
                     }
+
                     return $emotion->getName();
                 },
                 'placeholder' => 'Choisir une émotion',

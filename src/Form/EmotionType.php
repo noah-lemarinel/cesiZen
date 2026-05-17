@@ -7,8 +7,8 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmotionType extends AbstractType
@@ -43,7 +43,7 @@ class EmotionType extends AbstractType
                 'label' => 'Description',
                 'attr' => [
                     'rows' => 3,
-                    'placeholder' => 'Brève description de cette émotion...'
+                    'placeholder' => 'Brève description de cette émotion...',
                 ],
                 'help' => 'Description optionnelle pour les utilisateurs',
             ]);

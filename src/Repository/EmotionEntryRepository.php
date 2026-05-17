@@ -17,7 +17,7 @@ class EmotionEntryRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all emotion entries for a specific user
+     * Find all emotion entries for a specific user.
      */
     public function findByUser($user)
     {
@@ -30,7 +30,7 @@ class EmotionEntryRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all emotion entries for a specific user within a date range
+     * Find all emotion entries for a specific user within a date range.
      */
     public function findByUserAndPeriod($user, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate)
     {
@@ -46,4 +46,3 @@ class EmotionEntryRepository extends ServiceEntityRepository
             ->getResult();
     }
 }
-

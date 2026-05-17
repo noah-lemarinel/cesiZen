@@ -124,4 +124,3 @@ class BreathingExercise
         return $this;
     }
 }
-

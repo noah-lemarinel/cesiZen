@@ -71,7 +71,7 @@ class AdminBreathingExerciseController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if ($this->isCsrfTokenValid('delete' . $exercise->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$exercise->getId(), $request->request->get('_token'))) {
             $exerciseName = $exercise->getName();
             $em->remove($exercise);
             $em->flush();
@@ -82,4 +82,3 @@ class AdminBreathingExerciseController extends AbstractController
         return $this->redirectToRoute('admin_exercise_index');
     }
 }
-

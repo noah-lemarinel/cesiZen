@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\BreathingExercise;
+use App\Entity\User;
 use App\Form\BreathingExerciseType;
 use App\Repository\BreathingExerciseRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,6 +49,11 @@ class ExercisesController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $exercise = new BreathingExercise();
         $form = $this->createForm(BreathingExerciseType::class, $exercise);
         $form->handleRequest($request);
@@ -56,7 +62,7 @@ class ExercisesController extends AbstractController
             // Only set createdBy for non-admin users
             // Admins create default exercises (createdBy stays null)
             if (!$this->isGranted('ROLE_ADMIN')) {
-                $exercise->setCreatedBy($this->getUser());
+                $exercise->setCreatedBy($currentUser);
             }
             $em->persist($exercise);
             $em->flush();
@@ -76,8 +82,13 @@ class ExercisesController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         // Check if user is the creator or admin
-        if ($exercise->getCreatedBy() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($exercise->getCreatedBy() !== $currentUser && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres exercices.');
         }
 
@@ -103,12 +114,17 @@ class ExercisesController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         // Check if user is the creator or admin
-        if ($exercise->getCreatedBy() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($exercise->getCreatedBy() !== $currentUser && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres exercices.');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $exercise->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$exercise->getId(), $request->request->get('_token'))) {
             $exerciseName = $exercise->getName();
             $em->remove($exercise);
             $em->flush();
@@ -119,5 +135,3 @@ class ExercisesController extends AbstractController
         return $this->redirectToRoute('exercises_index');
     }
 }
-
-

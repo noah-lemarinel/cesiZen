@@ -38,7 +38,7 @@ class CreateEmotionsCommand extends Command
                     'Excitation' => 'Enthousiasme et énergie positive',
                     'Émerveillement' => 'Sensation de découverte et de merveille',
                     'Gratitude' => 'Reconnaissance et appréciation',
-                ]
+                ],
             ],
             'Colère' => [
                 'color' => '#FF0000',
@@ -50,7 +50,7 @@ class CreateEmotionsCommand extends Command
                     'Ressentiment' => 'Amertume face à une injustice perçue',
                     'Agacement' => 'Léger mécontentement répétitif',
                     'Hostilité' => 'Attitude opposée et combattive',
-                ]
+                ],
             ],
             'Peur' => [
                 'color' => '#8B008B',
@@ -62,7 +62,7 @@ class CreateEmotionsCommand extends Command
                     'Appréhension' => 'Crainte anticipée d\'un événement',
                     'Panique' => 'Peur soudaine et irraisonnée',
                     'Crainte' => 'Peur raisonnée et prudente',
-                ]
+                ],
             ],
             'Tristesse' => [
                 'color' => '#00008B',
@@ -74,7 +74,7 @@ class CreateEmotionsCommand extends Command
                     'Désespoir' => 'Perte totale d\'espoir',
                     'Solitude' => 'Sentiment d\'isolement émotionnel',
                     'Dépression' => 'État prolongé de tristesse profonde',
-                ]
+                ],
             ],
             'Surprise' => [
                 'color' => '#FFA500',
@@ -86,7 +86,7 @@ class CreateEmotionsCommand extends Command
                     'Incrédulité' => 'Doute face à ce qui semble impossible',
                     'Émerveillement' => 'Surprise positive et admiration',
                     'Confusion' => 'Désorientation face à quelque chose d\'imprévu',
-                ]
+                ],
             ],
             'Dégoût' => [
                 'color' => '#228B22',
@@ -98,13 +98,13 @@ class CreateEmotionsCommand extends Command
                     'Dédain' => 'Mépris et désapprobation',
                     'Horreur' => 'Répulsion intense face au répugnant',
                     'Dégoût profond' => 'Répulsion totale et révulsion',
-                ]
+                ],
             ],
         ];
 
         $count = 0;
         $existingEmotions = $this->entityManager->getRepository(Emotion::class)->findAll();
-        $existingNames = array_map(fn($e) => $e->getName(), $existingEmotions);
+        $existingNames = array_map(fn ($e) => $e->getName(), $existingEmotions);
 
         foreach ($emotionsData as $primaryName => $data) {
             // Create or get primary emotion
@@ -115,7 +115,7 @@ class CreateEmotionsCommand extends Command
                 $primary->setDescription($data['description']);
                 $this->entityManager->persist($primary);
                 $this->entityManager->flush();
-                $count++;
+                ++$count;
                 $io->writeln("✓ Créé: {$primaryName}");
             } else {
                 $primary = $this->entityManager->getRepository(Emotion::class)
@@ -131,7 +131,7 @@ class CreateEmotionsCommand extends Command
                     $secondary->setDescription($description);
                     $secondary->setParent($primary);
                     $this->entityManager->persist($secondary);
-                    $count++;
+                    ++$count;
                     $io->writeln("  ├─ Créé: {$secondaryName}");
                 } else {
                     $io->writeln("  ├─ Existe déjà: {$secondaryName}");
@@ -142,7 +142,7 @@ class CreateEmotionsCommand extends Command
         $this->entityManager->flush();
 
         $io->success("Émotions importées avec succès! ({$count} nouvelles émotions créées)");
+
         return Command::SUCCESS;
     }
 }
-

@@ -32,7 +32,7 @@ class AuthenticationTest extends WebTestCase
         $crawler = $client->request('GET', '/register');
 
         $formNode = $crawler->filter('#register-form');
-        if ($formNode->count() === 0) {
+        if (0 === $formNode->count()) {
             @mkdir(dirname(__DIR__).'/var', 0777, true);
             file_put_contents(dirname(__DIR__).'/var/test-debug-register.html', $client->getResponse()->getContent());
         }
@@ -41,7 +41,7 @@ class AuthenticationTest extends WebTestCase
         $form = $formNode->form([
             'name' => 'Test User',
             'email' => 'test+auto@example.com',
-            'password' => 'password123'
+            'password' => 'password123',
         ]);
 
         $client->submit($form);
@@ -50,8 +50,8 @@ class AuthenticationTest extends WebTestCase
         $this->assertTrue($client->getResponse()->isRedirect());
         $client->followRedirect();
 
-        // Check the response contains 'Connecté en tant que' in header
-        $this->assertStringContainsString('Connecté en tant que', $client->getResponse()->getContent());
+        // Check the response contains the logged-in navigation entry
+        $this->assertStringContainsString('Mon Compte', $client->getResponse()->getContent());
     }
 
     public function testLogin(): void
@@ -78,7 +78,7 @@ class AuthenticationTest extends WebTestCase
         $crawler = $client->request('GET', '/login');
 
         $formNode = $crawler->filter('#login-form');
-        if ($formNode->count() === 0) {
+        if (0 === $formNode->count()) {
             @mkdir(dirname(__DIR__).'/var', 0777, true);
             file_put_contents(dirname(__DIR__).'/var/test-debug-login.html', $client->getResponse()->getContent());
         }
@@ -86,14 +86,14 @@ class AuthenticationTest extends WebTestCase
 
         $form = $formNode->form([
             'email' => 'testlogin@example.com',
-            'password' => 'testpassword'
+            'password' => 'testpassword',
         ]);
 
         $client->submit($form);
         $this->assertTrue($client->getResponse()->isRedirect());
         $client->followRedirect();
 
-        // Confirm user is shown as logged in
-        $this->assertStringContainsString('Connecté en tant que', $client->getResponse()->getContent());
+        // Confirm the logged-in navigation is visible
+        $this->assertStringContainsString('Mon Compte', $client->getResponse()->getContent());
     }
 }

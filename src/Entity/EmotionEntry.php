@@ -78,4 +78,3 @@ class EmotionEntry
         return $this->createdAt;
     }
 }
-

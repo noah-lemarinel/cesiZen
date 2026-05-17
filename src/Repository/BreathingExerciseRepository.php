@@ -16,4 +16,3 @@ class BreathingExerciseRepository extends ServiceEntityRepository
         parent::__construct($registry, BreathingExercise::class);
     }
 }
-
