@@ -11,6 +11,7 @@ use App\Repository\EmotionEntryRepository;
 use App\Repository\EmotionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -248,5 +249,61 @@ class EmotionTrackerController extends AbstractController
             'year' => $today->modify('-1 year'),
             default => $today->modify('-1 month'),
         };
+    }
+
+    #[Route('/emotion/tracker/api/sync', name: 'emotion_tracker_api_sync', methods: ['POST'])]
+    public function syncLocalStorage(Request $request, EntityManagerInterface $entityManager, EmotionRepository $emotionRepository): JsonResponse
+    {
+        // Require authentication
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User) {
+            return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        try {
+            $data = json_decode($request->getContent(), true);
+            $entries = $data['entries'] ?? [];
+
+            $syncedCount = 0;
+
+            foreach ($entries as $entry) {
+                // Skip if already has a numeric ID (already synced)
+                if (is_numeric($entry['id'])) {
+                    continue;
+                }
+
+                // Find the emotion by ID
+                $emotion = $emotionRepository->find($entry['emotionId']);
+                if (!$emotion) {
+                    continue;
+                }
+
+                // Create and persist an EmotionEntry
+                $emotionEntry = new EmotionEntry();
+                $emotionEntry->setEmotion($emotion);
+                $emotionEntry->setNotes($entry['notes'] ?? null);
+                $emotionEntry->setUser($currentUser);
+
+                $entityManager->persist($emotionEntry);
+                $syncedCount++;
+            }
+
+            if ($syncedCount > 0) {
+                $entityManager->flush();
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'synced' => $syncedCount,
+                'message' => sprintf('%d emotion(s) synced successfully', $syncedCount)
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 }

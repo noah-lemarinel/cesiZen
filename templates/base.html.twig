@@ -45,7 +45,13 @@
     {% endblock %}
 
     {% block javascripts %}
+        <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+        <meta name="theme-color" content="#7FD8BE">
+        <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.svg') }}">
+        <meta name="mobile-web-app-capable" content="yes">
+
         <script defer src="{{ asset('js/theme-toggle.js') }}"></script>
+        <script defer src="{{ asset('js/emotion-tracker-storage.js') }}"></script>
     {% endblock %}
 </head>
 <body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white flex flex-col min-h-screen">
@@ -241,6 +247,21 @@
                 userDropdown.classList.add('hidden');
                 dropdownIcon.style.transform = 'rotate(0)';
             }
+        });
+    }
+</script>
+
+<script>
+    // Register Service Worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function(reg) {
+                    // Registration successful
+                    console.log('Service Worker registered at: ', reg.scope);
+                }).catch(function(err) {
+                    console.warn('Service Worker registration failed: ', err);
+                });
         });
     }
 </script>

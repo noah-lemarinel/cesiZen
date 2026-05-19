@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Hors-ligne - CesiZen</title>
+    <meta name="theme-color" content="#7FD8BE">
+    <style>
+      body { font-family: Arial, Helvetica, sans-serif; background:#f5f7fb; color:#0d1321; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; }
+      .card { max-width:720px; text-align:center; padding:24px; border-radius:8px; background:white; box-shadow:0 6px 18px rgba(13,19,33,0.08); }
+      h1 { margin:0 0 8px; }
+      .button { display:inline-block; margin-top:16px; padding:12px 18px; border-radius:999px; background:#7FD8BE; color:#0d1321; text-decoration:none; font-weight:700; border:0; cursor:pointer; }
+      .button:hover { filter:brightness(0.96); }
+      .hint { margin-top:12px; opacity:0.8; font-size:14px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Vous êtes hors-ligne</h1>
+      <p id="offline-status">La page que vous essayez d'ouvrir n'est pas disponible hors connexion. Certaines fonctionnalités peuvent fonctionner si elles ont été mises en cache.</p>
+      <p class="hint">Dès que la connexion revient, cette page essaiera automatiquement de vous renvoyer vers l'accueil.</p>
+      <button id="retry-button" class="button" type="button">Réessayer maintenant</button>
+      <p class="hint"><a href="/">Retour à l'accueil</a></p>
+    </div>
+
+    <script>
+      const homeUrl = '/';
+      const retryButton = document.getElementById('retry-button');
+      const offlineStatus = document.getElementById('offline-status');
+
+      async function checkConnectionAndRedirect() {
+        if (!navigator.onLine) {
+          if (offlineStatus) {
+            offlineStatus.textContent = 'Connexion toujours indisponible. Nous réessaierons automatiquement.';
+          }
+          return false;
+        }
+
+        try {
+          const response = await fetch(`${homeUrl}?pwa-check=${Date.now()}`, {
+            cache: 'no-store',
+            credentials: 'same-origin'
+          });
+
+          if (response.ok) {
+            window.location.replace(homeUrl);
+            return true;
+          }
+        } catch (error) {
+          // Ignore and keep the offline page visible.
+        }
+
+        return false;
+      }
+
+      if (retryButton) {
+        retryButton.addEventListener('click', () => {
+          checkConnectionAndRedirect();
+        });
+      }
+
+      window.addEventListener('online', () => {
+        checkConnectionAndRedirect();
+      });
+
+      setInterval(checkConnectionAndRedirect, 5000);
+      checkConnectionAndRedirect();
+    </script>
+  </body>
+</html>

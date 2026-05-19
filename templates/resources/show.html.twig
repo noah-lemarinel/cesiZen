@@ -17,10 +17,10 @@
                     <div class="text-sm text-gray-600 dark:text-gray-400">
                         <strong>Par {{ post.author.name ?? post.author.email }}</strong>
                         <br>
-                        Publié le {{ post.createdAt|format_datetime(locale='fr') }}
+                        Publié le {{ post.createdAt|format_datetime('long', 'short') }}
                         {% if post.updatedAt %}
                             <br>
-                            Modifié le {{ post.updatedAt|format_datetime(locale='fr') }}
+                            Modifié le {{ post.updatedAt|format_datetime('long', 'short') }}
                         {% endif %}
                     </div>
 
