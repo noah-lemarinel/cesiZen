@@ -52,6 +52,34 @@
 
         <script defer src="{{ asset('js/theme-toggle.js') }}"></script>
         <script defer src="{{ asset('js/emotion-tracker-storage.js') }}"></script>
+        <script>
+            // Handle automatic sync when online
+            window.addEventListener('online', async () => {
+                console.log('Connection restored - syncing offline data...');
+
+                // Retry offline requests via service worker
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'RETRY_OFFLINE_REQUESTS'
+                    });
+                }
+
+                // Sync emotion tracker entries
+                if (window.emotionTrackerStorage) {
+                    const result = await window.emotionTrackerStorage.syncWithServer();
+                    if (result.success && result.synced > 0) {
+                        console.log(`Synced ${result.synced} emotion entries`);
+                        // Show notification to user
+                        if ('Notification' in window && Notification.permission === 'granted') {
+                            new Notification('CesiZen - Synchronisation réussie', {
+                                body: `${result.synced} entrée(s) d'émotion synchronisée(s)`,
+                                tag: 'emotion-sync'
+                            });
+                        }
+                    }
+                }
+            });
+        </script>
     {% endblock %}
 </head>
 <body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white flex flex-col min-h-screen">

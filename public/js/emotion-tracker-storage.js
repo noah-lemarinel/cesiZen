@@ -7,6 +7,17 @@ class EmotionTrackerStorage {
     constructor() {
         this.storageKey = 'emotionTrackerEntries';
         this.synced = false;
+        this.syncPromise = null;
+    }
+
+    /**
+     * Initialize offline sync handler using IndexedDB
+     */
+    async initOfflineSync() {
+        // Check connection and sync if online
+        if (navigator.onLine) {
+            await this.syncWithServer();
+        }
     }
 
     /**
@@ -79,34 +90,50 @@ class EmotionTrackerStorage {
             return {success: true, synced: 0};
         }
 
-        try {
-            const response = await fetch('/emotion/tracker/api/sync', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    entries: unsyncedEntries
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // Mark entries as synced
-            unsyncedEntries.forEach(entry => {
-                this.markAsSynced(entry.id);
-            });
-
-            return {success: true, synced: unsyncedEntries.length};
-        } catch (error) {
-            console.error('Error syncing emotion tracker entries:', error);
-            return {success: false, error: error.message};
+        // Prevent multiple simultaneous syncs
+        if (this.syncPromise) {
+            return this.syncPromise;
         }
+
+        this.syncPromise = (async () => {
+            try {
+                const response = await fetch('/emotion/tracker/api/sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        entries: unsyncedEntries
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Mark entries as synced
+                unsyncedEntries.forEach(entry => {
+                    this.markAsSynced(entry.id);
+                });
+
+                // Dispatch custom event for UI updates
+                window.dispatchEvent(new CustomEvent('emotion:synced', {
+                    detail: { synced: unsyncedEntries.length }
+                }));
+
+                return {success: true, synced: unsyncedEntries.length};
+            } catch (error) {
+                console.error('Error syncing emotion tracker entries:', error);
+                return {success: false, error: error.message};
+            } finally {
+                this.syncPromise = null;
+            }
+        })();
+
+        return this.syncPromise;
     }
 
     /**

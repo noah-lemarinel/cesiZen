@@ -20,7 +20,7 @@
                 Vous êtes <strong id="status-text">en ligne</strong>. Les émotions seront enregistrées instantanément.
             </div>
             <div id="offline-warning" class="mb-4 p-3 rounded bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 text-sm hidden">
-                Vous êtes <strong>hors ligne</strong>. Les émotions seront sauvegardées localement et synchronisées quand vous serez en ligne.
+                <strong>🔌 Mode hors ligne activé</strong> — Les émotions seront sauvegardées localement et synchronisées automatiquement dès que la connexion revient.
             </div>
 
             {{ form_start(form, {'attr': {'class': 'space-y-6', 'id': 'emotion-form'}}) }}
@@ -175,6 +175,7 @@
                     form.submit();
                 } else {
                     // Save to local storage when offline
+                    e.preventDefault();
                     window.emotionTrackerStorage.addEntry(emotionId, emotionName, notes);
 
                     // Reset form
@@ -182,13 +183,21 @@
                     updatePreview();
                     updateLocalEntriesDisplay();
 
-                    alert('Émotion enregistrée localement. Elle sera synchronisée quand vous serez en ligne.');
+                    // Show success message with more details
+                    const unsyncedCount = window.emotionTrackerStorage.getUnsyncedEntries().length;
+                    alert(`✓ Émotion "${emotionName}" enregistrée localement.\n\nVous avez ${unsyncedCount} entrée(s) en attente de synchronisation.\n\nElle(s) sera/seront synchronisée(s) automatiquement dès que vous serez en ligne.`);
                 }
             });
 
             // Sync button
             syncBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
+
+                if (!navigator.onLine) {
+                    alert('Vous êtes actuellement hors ligne. La synchronisation s\'effectuera automatiquement dès que la connexion revient.');
+                    return;
+                }
+
                 syncBtn.disabled = true;
                 syncBtn.textContent = 'Synchronisation...';
 
