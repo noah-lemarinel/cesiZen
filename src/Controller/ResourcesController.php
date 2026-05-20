@@ -23,6 +23,7 @@ class ResourcesController extends AbstractController
     {
         $posts = $cache->get('blog_posts_published', function (ItemInterface $item) use ($blogPostRepository) {
             $item->expiresAfter(3600); // Cache for 1 hour
+
             return $blogPostRepository->findPublished();
         });
 
@@ -78,6 +79,7 @@ class ResourcesController extends AbstractController
         if ($post->isPublished()) {
             $post = $cache->get('blog_post_'.$post->getId(), function (ItemInterface $item) use ($post) {
                 $item->expiresAfter(3600); // Cache for 1 hour
+
                 return $post;
             });
         }

@@ -287,7 +287,7 @@ class EmotionTrackerController extends AbstractController
                 $emotionEntry->setUser($currentUser);
 
                 $entityManager->persist($emotionEntry);
-                $syncedCount++;
+                ++$syncedCount;
             }
 
             if ($syncedCount > 0) {
@@ -297,12 +297,12 @@ class EmotionTrackerController extends AbstractController
             return new JsonResponse([
                 'success' => true,
                 'synced' => $syncedCount,
-                'message' => sprintf('%d emotion(s) synced successfully', $syncedCount)
+                'message' => sprintf('%d emotion(s) synced successfully', $syncedCount),
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
     }

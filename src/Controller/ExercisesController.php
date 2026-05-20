@@ -21,6 +21,7 @@ class ExercisesController extends AbstractController
     {
         $defaultExercises = $cache->get('breathing_exercises_default', function (ItemInterface $item) use ($exerciseRepository) {
             $item->expiresAfter(3600); // Cache for 1 hour
+
             return $exerciseRepository->findBy(['createdBy' => null]);
         });
 
@@ -29,6 +30,7 @@ class ExercisesController extends AbstractController
             $userId = $this->getUser()->getId();
             $userExercises = $cache->get('breathing_exercises_user_'.$userId, function (ItemInterface $item) use ($exerciseRepository) {
                 $item->expiresAfter(3600); // Cache for 1 hour
+
                 return $exerciseRepository->findBy(['createdBy' => $this->getUser()]);
             });
         }
@@ -44,6 +46,7 @@ class ExercisesController extends AbstractController
     {
         $exercise = $cache->get('breathing_exercise_'.$id, function (ItemInterface $item) use ($exerciseRepository, $id) {
             $item->expiresAfter(3600); // Cache for 1 hour
+
             return $exerciseRepository->find($id);
         });
 
