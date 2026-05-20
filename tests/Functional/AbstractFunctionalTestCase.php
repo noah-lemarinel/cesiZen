@@ -12,6 +12,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 abstract class AbstractFunctionalTestCase extends WebTestCase
 {
@@ -23,6 +24,11 @@ abstract class AbstractFunctionalTestCase extends WebTestCase
         self::ensureKernelShutdown();
         $this->client = static::createClient();
         $this->em = static::getContainer()->get('doctrine')->getManager();
+
+        // Clear cache before rebuilding schema
+        $cache = static::getContainer()->get(CacheInterface::class);
+        $cache->clear();
+
         $this->rebuildSchema();
     }
 
@@ -32,12 +38,22 @@ abstract class AbstractFunctionalTestCase extends WebTestCase
             $this->em->clear();
         }
 
+        // Clear cache after test
+        try {
+            $cache = static::getContainer()->get(CacheInterface::class);
+            $cache->clear();
+        } catch (\Exception $e) {
+            // Container might be shut down
+        }
+
         self::ensureKernelShutdown();
         parent::tearDown();
     }
 
     protected function rebuildSchema(): void
     {
+        $this->em->clear();
+
         $metadata = $this->em->getMetadataFactory()->getAllMetadata();
         if ([] === $metadata) {
             return;
@@ -46,6 +62,8 @@ abstract class AbstractFunctionalTestCase extends WebTestCase
         $schemaTool = new SchemaTool($this->em);
         $schemaTool->dropSchema($metadata);
         $schemaTool->createSchema($metadata);
+
+        $this->em->clear();
     }
 
     protected function createUser(
