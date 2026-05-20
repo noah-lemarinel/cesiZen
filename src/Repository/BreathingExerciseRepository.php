@@ -15,4 +15,23 @@ class BreathingExerciseRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, BreathingExercise::class);
     }
+
+    public function findDefaultExercises(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.createdBy IS NULL')
+            ->orderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findUserExercises($user): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.createdBy = :user')
+            ->setParameter('user', $user)
+            ->orderBy('e.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
