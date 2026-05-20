@@ -26,8 +26,9 @@ class ExercisesController extends AbstractController
         });
 
         $userExercises = [];
-        if ($this->getUser()) {
-            $userId = $this->getUser()->getId();
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $userId = $user->getId();
             $userExercises = $cache->get('breathing_exercises_user_'.$userId, function (ItemInterface $item) use ($exerciseRepository) {
                 $item->expiresAfter(3600); // Cache for 1 hour
 
@@ -84,9 +85,7 @@ class ExercisesController extends AbstractController
 
             // Clear relevant cache
             $cache->delete('breathing_exercises_default');
-            if ($currentUser) {
-                $cache->delete('breathing_exercises_user_'.$currentUser->getId());
-            }
+            $cache->delete('breathing_exercises_user_'.$currentUser->getId());
 
             $this->addFlash('success', sprintf('Exercice "%s" créé avec succès!', $exercise->getName()));
 
@@ -122,9 +121,7 @@ class ExercisesController extends AbstractController
             // Clear relevant cache
             $cache->delete('breathing_exercise_'.$exercise->getId());
             $cache->delete('breathing_exercises_default');
-            if ($currentUser) {
-                $cache->delete('breathing_exercises_user_'.$currentUser->getId());
-            }
+            $cache->delete('breathing_exercises_user_'.$currentUser->getId());
 
             $this->addFlash('success', sprintf('Exercice "%s" modifié avec succès!', $exercise->getName()));
 
@@ -160,9 +157,7 @@ class ExercisesController extends AbstractController
             // Clear relevant cache
             $cache->delete('breathing_exercise_'.$exercise->getId());
             $cache->delete('breathing_exercises_default');
-            if ($currentUser) {
-                $cache->delete('breathing_exercises_user_'.$currentUser->getId());
-            }
+            $cache->delete('breathing_exercises_user_'.$currentUser->getId());
 
             $this->addFlash('success', sprintf('Exercice "%s" supprimé.', $exerciseName));
         }
