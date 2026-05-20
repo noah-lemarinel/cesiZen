@@ -23,8 +23,7 @@ jobs:
           php-version: '8.2'
           coverage: none
           tools: composer:v2
-          extensions: mbstring, intl, pdo_sqlite, sqlite3
-          cache: composer
+          extensions: dom, json, libxml, mbstring, tokenizer, xml, xmlwriter, intl, pdo_sqlite, sqlite3
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -46,7 +45,7 @@ jobs:
           php-version: '8.2'
           coverage: none
           tools: composer:v2
-          extensions: mbstring, intl, pdo_sqlite, sqlite3
+          extensions: dom, json, libxml, mbstring, tokenizer, xml, xmlwriter, intl, pdo_sqlite, sqlite3
           cache: composer
 
       - name: Install dependencies
@@ -69,7 +68,7 @@ jobs:
           php-version: '8.2'
           coverage: none
           tools: composer:v2
-          extensions: mbstring, intl, pdo_sqlite, sqlite3
+          extensions: dom, json, libxml, mbstring, tokenizer, xml, xmlwriter, intl, pdo_sqlite, sqlite3
           cache: composer
 
       - name: Install dependencies
