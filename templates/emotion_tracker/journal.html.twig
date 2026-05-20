@@ -16,8 +16,20 @@
             </div>
         </div>
 
+        <!-- Connection status and sync section -->
+        <div id="sync-section" class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-700 hidden">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Vous avez <span id="pending-count">0</span> entrée(s) en attente de synchronisation</p>
+                    <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">Ces entrées seront synchronisées quand vous serez en ligne.</p>
+                </div>
+                <button id="manual-sync-btn" type="button" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded text-sm whitespace-nowrap">Synchroniser maintenant</button>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 gap-4">
-            {% if emotions %}
+            {% if emotions or false %}
+                <!-- Server entries -->
                 {% for entry in emotions %}
                     {% set emotion = entry.emotion %}
                     {% set parentColor = emotion.parent ? emotion.parent.color : emotion.color %}
@@ -48,13 +60,128 @@
                         </div>
                     </div>
                 {% endfor %}
-            {% else %}
-                <div class="bg-white/60 dark:bg-gray-800 rounded p-8 shadow text-center">
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">Vous n'avez pas encore enregistré d'émotions.</p>
-                    <a href="{{ path('emotion_tracker_add') }}" class="inline-block bg-secondary text-white px-6 py-2 rounded shadow hover:bg-secondary/90">Ajouter votre première émotion</a>
-                </div>
             {% endif %}
+
+            <!-- Local storage entries -->
+            <div id="local-entries-container"></div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="bg-white/60 dark:bg-gray-800 rounded p-8 shadow text-center hidden">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Vous n'avez pas encore enregistré d'émotions.</p>
+                <a href="{{ path('emotion_tracker_add') }}" class="inline-block bg-secondary text-white px-6 py-2 rounded shadow hover:bg-secondary/90">Ajouter votre première émotion</a>
+            </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const localEntriesContainer = document.getElementById('local-entries-container');
+            const emptyState = document.getElementById('empty-state');
+            const syncSection = document.getElementById('sync-section');
+            const pendingCount = document.getElementById('pending-count');
+            const manualSyncBtn = document.getElementById('manual-sync-btn');
+
+            function renderLocalEntries() {
+                const entries = window.emotionTrackerStorage.getAllEntries();
+                const unsyncedCount = entries.filter(e => !e.synced).length;
+
+                localEntriesContainer.innerHTML = '';
+
+                if (entries.length === 0) {
+                    // Check if we have server entries
+                    const serverEntries = document.querySelectorAll('.flex-grow').length > 0;
+                    if (!serverEntries) {
+                        emptyState.classList.remove('hidden');
+                    }
+                    syncSection.classList.add('hidden');
+                    return;
+                }
+
+                // Show sync section if there are unsynced entries
+                if (unsyncedCount > 0) {
+                    syncSection.classList.remove('hidden');
+                    pendingCount.textContent = unsyncedCount;
+                } else {
+                    syncSection.classList.add('hidden');
+                }
+
+                emptyState.classList.add('hidden');
+
+                entries.forEach(entry => {
+                    const formatted = window.emotionTrackerStorage.formatEntryForDisplay(entry);
+                    const statusBadge = entry.synced
+                        ? '<span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 px-2 py-1 rounded">✓ Synchronisée</span>'
+                        : '<span class="text-xs bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100 px-2 py-1 rounded">En attente...</span>';
+
+                    const html = `
+                        <div class="flex items-start gap-4 bg-white/60 dark:bg-gray-800 rounded p-4 shadow hover:shadow-md transition-shadow opacity-75 border-l-4 border-orange-400">
+                            <div class="flex-shrink-0">
+                                <span class="inline-block w-6 h-6 rounded-full" style="background: #D4A574;"></span>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-semibold text-lg">${formatted.emotionName}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${formatted.formattedDate}</div>
+                                        <div class="mt-2">${statusBadge}</div>
+                                    </div>
+                                    <button type="button" class="text-red-600 hover:text-red-800 dark:hover:text-red-400 text-sm font-medium delete-local-entry" data-id="${formatted.id}">Supprimer</button>
+                                </div>
+                                ${formatted.notes ? `<div class="mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-700 dark:text-gray-200">${formatted.notes}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    localEntriesContainer.insertAdjacentHTML('beforeend', html);
+                });
+
+                // Add delete handlers
+                document.querySelectorAll('.delete-local-entry').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const id = btn.getAttribute('data-id');
+                        if (confirm('Supprimer cette entrée ?')) {
+                            window.emotionTrackerStorage.removeEntry(id);
+                            renderLocalEntries();
+                        }
+                    });
+                });
+            }
+
+            // Initial render
+            renderLocalEntries();
+
+            // Manual sync
+            manualSyncBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                manualSyncBtn.disabled = true;
+                manualSyncBtn.textContent = 'Synchronisation...';
+
+                const result = await window.emotionTrackerStorage.syncWithServer();
+
+                if (result.success) {
+                    manualSyncBtn.textContent = 'Synchroniser maintenant';
+                    manualSyncBtn.disabled = false;
+                    renderLocalEntries();
+                    if (result.synced > 0) {
+                        alert(`${result.synced} émotion(s) synchronisée(s) avec succès!`);
+                        // Reload to show merged entries
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                } else {
+                    alert('Erreur lors de la synchronisation: ' + result.error);
+                    manualSyncBtn.disabled = false;
+                    manualSyncBtn.textContent = 'Synchroniser maintenant';
+                }
+            });
+
+            // Update display when adding entries
+            window.addEventListener('emotion:added', () => {
+                renderLocalEntries();
+            });
+        });
+    </script>
 {% endblock %}
 

@@ -32,7 +32,7 @@
                             <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
                                 Par <strong>{{ post.author.name ?? post.author.email }}</strong>
                                 <br>
-                                {{ post.createdAt|format_datetime(locale='fr') }}
+                                {{ post.createdAt|format_datetime('long', 'short') }}
                             </div>
                             <p class="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
                                 {{ post.content[:200] }}...

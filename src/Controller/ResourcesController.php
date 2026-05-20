@@ -12,14 +12,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route('/ressources')]
 class ResourcesController extends AbstractController
 {
     #[Route('', name: 'resources_index')]
-    public function index(BlogPostRepository $blogPostRepository): Response
+    public function index(BlogPostRepository $blogPostRepository, CacheInterface $cache): Response
     {
-        $posts = $blogPostRepository->findPublished();
+        $posts = $cache->get('blog_posts_published', function (ItemInterface $item) use ($blogPostRepository) {
+            $item->expiresAfter(3600); // Cache for 1 hour
+            return $blogPostRepository->findPublished();
+        });
 
         return $this->render('resources/index.html.twig', [
             'posts' => $posts,
@@ -28,7 +33,7 @@ class ResourcesController extends AbstractController
 
     #[Route('/blog/new', name: 'blog_post_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CacheInterface $cache): Response
     {
         // Check if user is admin
         $currentUser = $this->getUser();
@@ -46,6 +51,11 @@ class ResourcesController extends AbstractController
             $em->persist($post);
             $em->flush();
 
+            // Clear blog posts cache if published
+            if ($post->isPublished()) {
+                $cache->delete('blog_posts_published');
+            }
+
             $this->addFlash('success', 'Blog post created successfully!');
 
             return $this->redirectToRoute('resources_index');
@@ -57,11 +67,19 @@ class ResourcesController extends AbstractController
     }
 
     #[Route('/blog/{id}', name: 'blog_post_show')]
-    public function show(BlogPost $post): Response
+    public function show(BlogPost $post, CacheInterface $cache): Response
     {
         $currentUser = $this->getUser();
         if (!$post->isPublished() && (!$currentUser instanceof User || !$currentUser->isAdmin())) {
             throw $this->createNotFoundException('Ce blog n\'existe pas.');
+        }
+
+        // Cache single blog post (only published ones benefit from caching)
+        if ($post->isPublished()) {
+            $post = $cache->get('blog_post_'.$post->getId(), function (ItemInterface $item) use ($post) {
+                $item->expiresAfter(3600); // Cache for 1 hour
+                return $post;
+            });
         }
 
         return $this->render('resources/show.html.twig', [
@@ -71,7 +89,7 @@ class ResourcesController extends AbstractController
 
     #[Route('/blog/{id}/edit', name: 'blog_post_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function edit(BlogPost $post, Request $request, EntityManagerInterface $em): Response
+    public function edit(BlogPost $post, Request $request, EntityManagerInterface $em, CacheInterface $cache): Response
     {
         // Check if user is admin
         $currentUser = $this->getUser();
@@ -86,6 +104,12 @@ class ResourcesController extends AbstractController
             $post->setUpdatedAt(new \DateTime());
             $em->flush();
 
+            // Clear relevant cache
+            if ($post->isPublished()) {
+                $cache->delete('blog_posts_published');
+                $cache->delete('blog_post_'.$post->getId());
+            }
+
             $this->addFlash('success', 'Blog post updated successfully!');
 
             return $this->redirectToRoute('blog_post_show', ['id' => $post->getId()]);
@@ -99,7 +123,7 @@ class ResourcesController extends AbstractController
 
     #[Route('/blog/{id}/delete', name: 'blog_post_delete', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function delete(BlogPost $post, Request $request, EntityManagerInterface $em): Response
+    public function delete(BlogPost $post, Request $request, EntityManagerInterface $em, CacheInterface $cache): Response
     {
         // Check if user is admin
         $currentUser = $this->getUser();
@@ -110,6 +134,12 @@ class ResourcesController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
             $em->remove($post);
             $em->flush();
+
+            // Clear relevant cache
+            if ($post->isPublished()) {
+                $cache->delete('blog_posts_published');
+                $cache->delete('blog_post_'.$post->getId());
+            }
 
             $this->addFlash('success', 'Blog post deleted successfully!');
         }

@@ -17,6 +17,7 @@
         "symfony/flex": "^2.10",
         "symfony/form": "7.4.*",
         "symfony/framework-bundle": "7.4.*",
+        "symfony/intl": "7.4.*",
         "symfony/options-resolver": "7.4.*",
         "symfony/password-hasher": "7.4.*",
         "symfony/runtime": "7.4.*",
