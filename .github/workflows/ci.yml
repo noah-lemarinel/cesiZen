@@ -74,7 +74,12 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Create var directory
+        run: mkdir -p var
+
       - name: Run PHPUnit
         run: vendor/bin/phpunit --colors=always
+        env:
+          DATABASE_URL: "sqlite:///./var/test.sqlite"
 
 
