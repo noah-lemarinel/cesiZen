@@ -6,40 +6,30 @@ use App\Entity\BlogPost;
 
 class ResourcesFlowTest extends AbstractFunctionalTestCase
 {
-    public function testGuestsCanSeePublishedResourcesOnly(): void
+    public function testAllResourcesAreVisible(): void
     {
         $author = $this->createUser('author@example.com', 'Auteur', 'password123');
-        $published = $this->createBlogPost($author, 'Article publié', 'Contenu publié', true);
-        $unpublished = $this->createBlogPost($author, 'Article brouillon', 'Contenu brouillon', false);
+        $post1 = $this->createBlogPost($author, 'Article 1', 'Contenu 1');
+        $post2 = $this->createBlogPost($author, 'Article 2', 'Contenu 2');
 
         $this->client->request('GET', '/ressources');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Ressources');
-        $this->assertSelectorTextContains('body', 'Article publié');
-        $this->assertSelectorTextNotContains('body', 'Article brouillon');
+        $this->assertSelectorTextContains('body', 'Article 1');
+        $this->assertSelectorTextContains('body', 'Article 2');
     }
 
-    public function testGuestsCanReadPublishedArticle(): void
+    public function testGuestsCanReadArticle(): void
     {
         $author = $this->createUser('author2@example.com', 'Auteur', 'password123');
-        $post = $this->createBlogPost($author, 'Lecture publique', 'Le contenu de l’article.', true);
+        $post = $this->createBlogPost($author, 'Lecture publique', 'Le contenu de l\'article.');
 
         $this->client->request('GET', '/ressources/blog/'.$post->getId());
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Lecture publique');
-        $this->assertSelectorTextContains('body', 'Le contenu de l’article.');
-    }
-
-    public function testGuestsCannotReadUnpublishedArticle(): void
-    {
-        $author = $this->createUser('author3@example.com', 'Auteur', 'password123');
-        $post = $this->createBlogPost($author, 'Confidentiel', 'Article caché', false);
-
-        $this->client->request('GET', '/ressources/blog/'.$post->getId());
-
-        $this->assertResponseStatusCodeSame(404);
+        $this->assertSelectorTextContains('body', 'Le contenu de l\'article.');
     }
 
     public function testAdminCanCreateEditAndDeleteAnArticle(): void
@@ -53,7 +43,6 @@ class ResourcesFlowTest extends AbstractFunctionalTestCase
         $form = $crawler->selectButton('Créer l\'article')->form([
             'blog_post[title]' => 'Nouvel article',
             'blog_post[content]' => 'Contenu initial',
-            'blog_post[isPublished]' => '1',
         ]);
 
         $this->client->submit($form);
@@ -72,7 +61,6 @@ class ResourcesFlowTest extends AbstractFunctionalTestCase
         $editForm = $crawler->selectButton('Enregistrer les modifications')->form([
             'blog_post[title]' => 'Article mis à jour',
             'blog_post[content]' => 'Contenu modifié',
-            'blog_post[isPublished]' => '1',
         ]);
 
         $this->client->submit($editForm);
@@ -99,18 +87,5 @@ class ResourcesFlowTest extends AbstractFunctionalTestCase
         $this->client->request('GET', '/ressources/blog/new');
 
         $this->assertResponseStatusCodeSame(403);
-    }
-
-    public function testAdminCanReadUnpublishedArticle(): void
-    {
-        $admin = $this->createUser('admin-read@example.com', 'Admin', 'password123', true);
-        $post = $this->createBlogPost($admin, 'Brouillon admin', 'Contenu privé', false);
-        $this->client->loginUser($admin);
-
-        $this->client->request('GET', '/ressources/blog/'.$post->getId());
-
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('body', 'Brouillon admin');
-        $this->assertSelectorTextContains('body', 'Contenu privé');
     }
 }

@@ -51,11 +51,7 @@ class ResourcesController extends AbstractController
             $post->setUpdatedAt(new \DateTime());
             $em->persist($post);
             $em->flush();
-
-            // Clear blog posts cache if published
-            if ($post->isPublished()) {
-                $cache->delete('blog_posts_published');
-            }
+            $cache->delete('blog_posts_published');
 
             $this->addFlash('success', 'Blog post created successfully!');
 
@@ -71,18 +67,13 @@ class ResourcesController extends AbstractController
     public function show(BlogPost $post, CacheInterface $cache): Response
     {
         $currentUser = $this->getUser();
-        if (!$post->isPublished() && (!$currentUser instanceof User || !$currentUser->isAdmin())) {
-            throw $this->createNotFoundException('Ce blog n\'existe pas.');
-        }
 
-        // Cache single blog post (only published ones benefit from caching)
-        if ($post->isPublished()) {
-            $post = $cache->get('blog_post_'.$post->getId(), function (ItemInterface $item) use ($post) {
-                $item->expiresAfter(3600); // Cache for 1 hour
+        // Cache single blog post
+        $post = $cache->get('blog_post_'.$post->getId(), function (ItemInterface $item) use ($post) {
+            $item->expiresAfter(3600); // Cache for 1 hour
 
-                return $post;
-            });
-        }
+            return $post;
+        });
 
         return $this->render('resources/show.html.twig', [
             'post' => $post,
@@ -107,10 +98,8 @@ class ResourcesController extends AbstractController
             $em->flush();
 
             // Clear relevant cache
-            if ($post->isPublished()) {
-                $cache->delete('blog_posts_published');
-                $cache->delete('blog_post_'.$post->getId());
-            }
+            $cache->delete('blog_posts_published');
+            $cache->delete('blog_post_'.$post->getId());
 
             $this->addFlash('success', 'Blog post updated successfully!');
 
@@ -138,10 +127,8 @@ class ResourcesController extends AbstractController
             $em->flush();
 
             // Clear relevant cache
-            if ($post->isPublished()) {
-                $cache->delete('blog_posts_published');
-                $cache->delete('blog_post_'.$post->getId());
-            }
+            $cache->delete('blog_posts_published');
+            $cache->delete('blog_post_'.$post->getId());
 
             $this->addFlash('success', 'Blog post deleted successfully!');
         }

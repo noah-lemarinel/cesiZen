@@ -94,16 +94,13 @@ abstract class AbstractFunctionalTestCase extends WebTestCase
         User $author,
         string $title,
         string $content,
-        bool $isPublished = true,
         ?\DateTimeInterface $updatedAt = null,
     ): BlogPost {
         $post = new BlogPost();
         $post->setAuthor($author);
         $post->setTitle($title);
         $post->setContent($content);
-        $post->setIsPublished($isPublished);
         $post->setUpdatedAt($updatedAt);
-
         $this->em->persist($post);
         $this->em->flush();
         $this->em->refresh($post);

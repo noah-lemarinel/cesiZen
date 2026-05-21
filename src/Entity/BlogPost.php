@@ -30,9 +30,6 @@ class BlogPost
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
-    private bool $isPublished = true;
-
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -99,18 +96,6 @@ class BlogPost
     public function setAuthor(?User $author): self
     {
         $this->author = $author;
-
-        return $this;
-    }
-
-    public function isPublished(): bool
-    {
-        return $this->isPublished;
-    }
-
-    public function setIsPublished(bool $isPublished): self
-    {
-        $this->isPublished = $isPublished;
 
         return $this;
     }

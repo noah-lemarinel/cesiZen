@@ -54,7 +54,6 @@ erDiagram
         datetime created_at
         datetime updated_at
         int author_id FK
-        boolean is_published
     }
 ```
 
@@ -109,7 +108,6 @@ erDiagram
   - `created_at`: Date de création
   - `updated_at`: Date de modification (nullable)
   - `author_id`: Utilisateur auteur (obligatoire)
-  - `is_published`: Booléen pour publier/dépublier
 
 ## Diagramme de Classes (Vue Alternatif en Mermaid)
 
@@ -160,7 +158,6 @@ classDiagram
         DateTime createdAt
         DateTime updatedAt
         User author
-        boolean isPublished
     }
 
     User "1" -- "0..*" EmotionEntry : enregistre
@@ -547,7 +544,6 @@ L'entité `BlogPost` représente un article de blog. Elle permet aux administrat
 | `createdAt` | DateTime | ❌ | ❌ | Date/heure de création (auto-initialisée) |
 | `updatedAt` | DateTime | ✅ | ❌ | Date/heure de dernière modification |
 | `author` | User | ❌ | ❌ | Utilisateur auteur de l'article (relation obligatoire) |
-| `isPublished` | BOOLEAN | ❌ | ❌ | Flag de publication (défaut: true) |
 
 ### Fonctions principales
 
@@ -588,23 +584,12 @@ setAuthor(?User $author): self
 - Getter/Setter pour l'utilisateur auteur
 - Obligatoire pour tout article
 
-#### Gestion de la publication
-```php
-isPublished(): boolean
-setIsPublished(bool $isPublished): self
-```
-- Getter/Setter pour le statut de publication
-- Défaut: true (publié immédiatement)
-- Permet de créer des brouillons (isPublished = false)
-
 ### Cas d'usage
 - ✅ Rédiger des articles éducatifs sur les émotions
 - ✅ Publier des conseils et ressources
-- ✅ Créer des brouillons avant publication
 - ✅ Modifier articles après création
-- ✅ Archiver/dépublier des articles
+- ✅ Archiver/supprimer des articles
 - ✅ Afficher l'historique de modification
-- ✅ Filtrer les articles publiés vs brouillons
 
 ### Exemple d'article
 ```
@@ -612,7 +597,6 @@ Titre: "Techniques de Respiration pour Gérer l'Anxiété"
 Auteur: Alice (Admin)
 Créé: 18/05/2026 09:00
 Modifié: 18/05/2026 14:30
-Publié: true
 
 Contenu:
 # Gestion de l'Anxiété par la Respiration
@@ -655,9 +639,8 @@ Résultat: Un exercice réutilisable pour gérer l'émotion
 Admin rédige un BlogPost
 │
 ├─→ Rédige titre + contenu
-├─→ Marque comme brouillon au départ (isPublished = false)
-├─→ Relecture et modifications
-└─→ Publie (isPublished = true)
+├─→ Crée et publie l'article
+└─→ Article devient directement accessible aux utilisateurs
 
 Résultat: Du contenu éducatif pour les utilisateurs
 ```

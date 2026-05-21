@@ -26,10 +26,6 @@ class BlogPostType extends AbstractType
                     'rows' => 10,
                 ],
             ])
-            ->add('isPublished', CheckboxType::class, [
-                'label' => 'Publié',
-                'required' => false,
-            ])
         ;
     }
 

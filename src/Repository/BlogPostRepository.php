@@ -22,7 +22,6 @@ class BlogPostRepository extends ServiceEntityRepository
     public function findPublished(): array
     {
         return $this->createQueryBuilder('bp')
-            ->where('bp.isPublished = true')
             ->orderBy('bp.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
