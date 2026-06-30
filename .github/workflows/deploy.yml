@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+    push:
+        branches:
+            - main
+    workflow_run:
+        workflows:
+            - CI
+        types:
+            - completed
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        if: >
+            github.event_name == 'push' ||
+            github.event.workflow_run.conclusion == 'success'
+
+        steps:
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USER }}
+                  key: ${{ secrets.SSH_KEY }}
+                  port: ${{ secrets.SSH_PORT }}
+                  script: |
+                      cd /var/www/your-project
+
+                      git fetch origin
+                      git reset --hard origin/main
+
+                      composer install \
+                        --no-dev \
+                        --optimize-autoloader \
+                        --no-interaction
+
+                      npm ci
+                      npm run build
+
+                      php bin/console doctrine:migrations:migrate --no-interaction
+
+                      php bin/console cache:clear --env=prod
+                      php bin/console cache:warmup --env=prod
