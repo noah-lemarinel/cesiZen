@@ -2,7 +2,7 @@
 set -e
 
 echo "Attente DB..."
-timeout 30s sh -c 'until nc -z db 3306 2>/dev/null; do echo "."; sleep 1; done' || (echo "DB KO" && exit 1)
+timeout 30s sh -c 'until nc -z db 5432 2>/dev/null; do echo "."; sleep 1; done' || (echo "DB KO" && exit 1)
 echo "DB OK !"
 
 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
