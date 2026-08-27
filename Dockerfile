@@ -12,11 +12,13 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     netcat-traditional \
     libicu-dev \
+    libpq-dev \
+    postgresql-client \
     pkg-config \
     nginx \
     supervisor \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install pdo pdo_mysql zip bcmath intl gd \
+    && docker-php-ext-install pdo pdo_pgsql zip bcmath intl gd \
     && rm -rf /var/lib/apt/lists/*
 
 # Composer
